@@ -81,3 +81,18 @@ ul li.active a{
     float: center;
 
 }
+ 
+
+
+.uk-width-expand h3{
+    color: rgb(184, 163, 206);
+    font-size: 20px;
+    float: right;
+    font-family: 'Aref Ruqaa', serif;
+}
+
+.cae{
+    align-self: auto;
+    font-size: 100px;
+    float: center;
+}
