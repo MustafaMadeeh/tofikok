@@ -7,7 +7,7 @@ function sendmessage(){
   }</script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.2.3/jquery.min.js"></script>
 
-
+<link rel="icon" href="logo.jpg" type="image/icon type">
 <link rel="stylesheet" type="text/css" href="style.css">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 
@@ -22,43 +22,47 @@ function sendmessage(){
 <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Aref+Ruqaa" rel="stylesheet">
 
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 
 <header>
-<div class="cae">
-<div class="uk-card uk-card-default uk-width-1-2@m" >
-        <div class="uk-card-header">
-            <div class="uk-grid-small uk-flex-middle" uk-grid>
-                <div class="uk-width-auto">
-                    <img class="uk-border-circle" width="50" height="50" src="my.jpg">
-                </div>
 
-                <div class="uk-width-expand">
-                    <h3 class="uk-card-title uk-margin-remove-bottom">أرسل رساله</h3>
-               </div>
+  
+    </div>
+    <ul>
+<li class="active"><a href="index.html">Home</a></li>
+<li><a href="touch.html">Me</a></li>
+</ul>
+</div>
 
-            </div>
-        </div>
-        <div class="uk-card-body">
 
-                <div id="mes">
-                        <div class="uk-margin">
-                                <div class="uk-inline">
-                                    <a class="uk-form-icon" href="#" uk-icon="icon: pencil"></a>
-                                    <input type="text" id="message" value=""class="uk-input" type="text">
-                                </div>
-                            </div>
-                            
+                <div class="mes">
+                <div class="card" style="width: 40rem;">
+                        <img class="uk-border-circle" class="card-img-top" src="my.jpg" alt="Card image cap">
+                     
+                        <div id="mes">
+      
+                            <div class="card-body">
+                          <h3>أكتب رسالتك</h3>
+                          
+                          <p class="card-text">
+                              
+              
+                                        <label for="comment"></label>
+                                        <textarea  type="text" id="message" class="form-control" rows="5" id="comment"></textarea>
+                                  
+                          </p>
+                          <div id="target">
+                                <button class="uk-button uk-button-primary" onclick=sendmessage()>أرسال</button>
+                             </div>
                         </div>
-                
-                    </div>
-        <div class="uk-card-footer">
-         
-<div id="target">
-        <button class="uk-button uk-button-primary" onclick=sendmessage()>أرسال</button>
-     </div>
+                      </div>
+            
+
      
     </div>
-</div>
 </div>
 </header>
 
@@ -67,6 +71,10 @@ function sendmessage(){
  <script>
  $( "#target" ).click(function() {
  $('#mes').empty();
+
+ alert('تم أرسال الرساله.');
+ $('#mes').submit();
+
 });
 </script>
 
