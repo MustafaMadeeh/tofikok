@@ -1,42 +1,132 @@
+<html>
+<head>
+	<meta name="viewport" charset="UTF-8" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<title>3D snake game</title>
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.2/dat.gui.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/92/three.js"></script>
+	<script src="https://dl.dropbox.com/s/nn9wz6aimz6vzoi/OBJLoader.js"></script>
+	<script src="https://dl.dropbox.com/s/2821pj5wkc2b8pe/MTLLoader.js"></script>
+	<script src="https://dl.dropbox.com/s/qxgrvxduynnst3u/OrbitControls.js"></script>
+	<audio id="niceSong" src="https://dl.dropbox.com/s/47yhesl39v8w3at/niceSong.mp3"></audio>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+
+</head>
+
+<body style="margin: 0px;">
+	
+	<div id="arrowCont">
+		<img class="arrows" id="left" src="https://saantonandre.github.io/leftArrow.png" alt="arrow" draggable="false" oncontextmenu="return false;">
+		<img class="arrows" id="right" src="https://saantonandre.github.io/rightArrow.png" alt="arrow" draggable="false" oncontextmenu="return false;">
+	</div>
+
+	<div id="scoreId">النتيجة: 0</div>
+
+</body>
+</html>
+
+<style>
+body{
+	height:100%;
+	width:100%;
+	position:fixed;
+}
+
+
+#arrowCont {
+	
+position: absolute;
+	
+width: 100%;
+	
+height: 12vh;
+	
+bottom: 10vh;
+}
+
+
+
+.arrows {
+	
+height: 80%;
+}
+
+
+
+
+#right {
+	
+float: right;
+
+transform:scale(1.5,1.5);
+	
+opacity: 0.9;
+	
+margin-right: 10%;
+	
+background-color: 
+transparent;
+	
+border-radius: 50%;
+	
+-webkit-user-select: none;
+	
+-webkit-touch-callout: none;
+}
+
+
+
+#left {
+	
+float: left;
+
+transform:scale(1.5,1.5);
+	
+opacity: 0.9;
+	
+margin-left: 10%;
+	
+background-color: transparent;
+	
+border-radius: 50%;
+	
+-webkit-user-select: none;
+	
+-webkit-touch-callout: none;
+}
+
+
+#scoreId {
+	
+   position: fixed;
+   left: 50%;
+   transform: translate(-50%, 0);
+	
+color: white;
+width:40%;
+text-align:center;
+
+	
+bottom: 13.5vh;
+	
+margin-top: -25px; 
+	
+font-size: 22px;
+	
+font-weight:bold;
+	
+text-shadow:1px 1px 0px black;
+}
+
+
+
+</style>
+<script>
+
 window.addEventListener('load', function(){
 
-/* Made by Joakim Nyland
-
-I put a lot effort into this so I hope you like it!😄
-
-During this project I learnt a lot about array manipulation. Useful functions I used:
-- Push
-- Slice
-
-I also learnt a lot about timing events, which were very useful when making this.
-
-I hope you can give me a thumbs up if you liked it!
-
-Thank you all for 2000 followers! 
-Thanks to Saantoandre for arrow sprites.
-
-Please give me feedback if you find bugs or have suggestions!:-)
-
-Joakim
-
-More about controls:
-- Pan/zoom while playing using your fingers/mouse
-
-- Enable POV using the GUI.
-
-- You lose by crashing into your tail or going out of the map.
-
-- You should not have battery-saver activated while playing. The game has a lot of code so it should be run with as much capacity as possible.
-
-- When snake becomes long the game
-might become laggy on phones.
-
-Future plans for the game:
-- Make code more readable with comments
-- Add more sound effects?
-- Maybe add more stages with obstacles and stuff
-
-*/
 
 console.log=function(){};
 const SCALE = 27;
@@ -421,7 +511,7 @@ function yum(){
 	collArray=[];
 	collArray = bodyArray.slice(q,bodyArray.length);
 
-	scoreId.innerHTML = "Score: " + eatVar;
+	scoreId.innerHTML = "النتيجة: " + eatVar;
 
 	for (qTimer=0;qTimer<myTimer.length;qTimer++){
 	clearTimeout(myTimer[qTimer]);
@@ -596,8 +686,8 @@ function pause(){
 	{
 		setTimeout(pauseMessage,(myArray.length+1)*ballTimerVar);
 	function pauseMessage(){
-swal( "❌Game Over❌","You fell to your death!\nYour score: " + eatVar + "\n\n😄 Thanks for playing! 😄");
-scoreId.innerHTML = "◀️ Press to restart ▶️";
+swal( "❌أنتهت اللعبه❌","وقعت خارج الخارطه!\nالنتيجة: " + eatVar + "\n\😄");
+scoreId.innerHTML = "◀️أضغط للعب مجدداً ▶️";
 
 	leftArrow.style.opacity = "1";
 	
@@ -618,14 +708,14 @@ for(qTimer=0;qTimer<zTimer.length;qTimer++){
 	tailCollisionVar=1;
 	setTimeout(pauseMessage2,(myArray.length+1)*ballTimerVar);
 	function pauseMessage2(){
-	swal( "❌Game Over❌","You crashed into your tail!\nYour score: " + eatVar + "\n\n😄 Thanks for playing! 😄");
+	swal( "❌أنتهت اللعبه❌","لقد خسرت!\nالنتيجة: " + eatVar + "\n\n😄");
 
 	leftArrow.style.opacity = "1";
 	rightArrow.style.opacity = "1";
 	pauseVar=1;
 	arrowVar=0;
 
-	scoreId.innerHTML = "◀️ Press to restart ▶️";
+	scoreId.innerHTML = "◀️ أضغط للعب مجدداً ▶️";
 		}
 	   	pauseMessageVar = 1;
 	}
@@ -649,7 +739,7 @@ function resetGame(){
 	myObject.position.y=0;
 	myObject.position.z=1.1;
 	eatVar=0;
-	scoreId.innerHTML = "Score: " + eatVar;
+	scoreId.innerHTML = "النتيجة: " + eatVar;
 	myTimer=[];
 	bodyArray = [];
 	zArray=[];
@@ -688,9 +778,9 @@ ballTimerVar = (320/10)*6;
 }
 }
 
-swal("🐍 3D Snake 🐍", "Instructions:\n🍎Control the snake and eat as many apples as you can!🍎" );
+swal("🐍 3D Snake 🐍", "توضيح:\n🍎تحكم في الأفعى وكُل أكثر قدر ممكن من التفاح!🍎" );
 pauseVar=1;
-scoreId.innerHTML = "◀️\nPress to start\n▶️";
+scoreId.innerHTML = "◀️\nأضغط للبدء\n▶️";
 
 	//********** Render function **********
 var render = function () 
@@ -724,3 +814,5 @@ render();
 });
 
 //Made by Joakim Nyland
+
+</script>
