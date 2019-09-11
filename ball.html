@@ -1,0 +1,445 @@
+ 
+
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta name="description" content="Foosball Game">
+        <meta name="keywords" content="sololearn,foosball game">
+        <meta name="author" content="WASP - https://www.sololearn.com/Profile/7532653">
+        <meta name="date" content="2018-03-01" scheme="YYYY-MM-DD">
+        <meta name="revised" content="2018-03-01" scheme="YYYY-MM-DD">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8">
+        <title>Foosball Game</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div id="main">
+            <div style="position:absolute;top:3px;left:0;width:100%;">
+                <div style="float:left;margin:0 0 0 15px;">الركلات: <span id="kicks">0</span></div>
+                <div style="float:right;margin:0 15px 0 0;">الأهداف: <span id="goals">0</span></div>
+            </div>
+            <div id="walls">
+                <div id="ball">
+                    <div id="ball_direction"></div>
+                    <div id="ball_image"></div>
+                </div>
+            </div>
+            <div class="players_line" id="players_line_1" style="top:500px;">
+                <div class="sticks"></div>
+                <div class="players" style="left:162px;background-position:35px 0px"></div>
+            </div>
+            <div class="players_line" id="players_line_2" style="top:145px;">
+                <div class="sticks"></div>
+                <div class="players" style="left:92px;background-position:0 0"></div>
+                <div class="players" style="left:232px;background-position:-35px 0"></div>
+            </div>
+            <div class="players_line" id="players_line_3" style="top:260px;">
+                <div class="sticks"></div>
+                <div class="players" style="left:900px;background-position:-700px 0"></div>
+                <div class="players" style="left:502px;background-position:-105px 0"></div>
+            </div>
+            <input id="deg" class="slider" type="range" min="-1000" max="1000" value="-101"/>
+            <button id="playagain">بدء</button>
+            <div id="goal"></div>
+            <div id="instructions">
+                <div style="font-size:23px;font-weight:bold;">
+                   كره القدم<br>
+                    <br><br>
+                </div>
+               سدد الكره بطريقه تتفادى بها اللاعبين وسجل الأهداف.<br><br>
+ 
+            </div>
+        </div>
+    </body>
+</html>
+
+<style>
+ 
+ body {
+    font-family: arial, helvetica;
+    font-size:19px;
+    font-weight:bold;
+    margin:0;
+    background-color:#d2e6c2;
+}
+button {
+    position:absolute;
+    top:398px;
+    left:90px;
+    width:175px;
+    height: 50px;
+    font-size:19px;
+    font-family:arial, helvetica;
+    font-weight:bold;
+    padding:7px 15px 7px 15px;
+    margin:10px 0 0 0;
+    border:2px solid #202020;
+    -webkit-border-radius:25px;
+    -moz-border-radius:25px;
+    border-radius:25px;
+    background-color:#ffffff;
+    color:#202020;
+    cursor:pointer;
+}
+button:hover {
+    background-color:#202020;
+    border:2px solid #202020;
+    color:#ffffff;
+}
+.slider {
+    position:absolute;
+    top:405px;
+    left:40px;
+    width:275px;
+    height: 50px;
+    border-radius: 25px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.6;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    -o-appearance: none;
+    appearance: none;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    display:none;
+}
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #707070;
+    cursor: pointer;
+    background-image:url(https://i.imgur.com/p8DUpGn.png);
+    background-repeat:no-repeat;
+    background-position:center center;
+}
+.slider::-moz-range-thumb {
+    -moz-appearance: none;
+    appearance: none;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #707070;
+    cursor: pointer;
+    background-image:url(https://i.imgur.com/p8DUpGn.png);
+    background-repeat:no-repeat;
+    background-position:center center;
+}
+#main {
+    position:relative;
+    margin:auto;
+    width:360px;
+    height:440px;
+    background-image:url(https://i.imgur.com/QSIH47g.png);
+    background-repeat:no-repeat;
+}
+#walls {
+    position:absolute;
+    width:293px;
+    height:360px;
+    top:42px;
+    left:32px;
+}
+#ball {
+    position:absolute;
+    top:330px;
+    left:130px;
+    width:33px;
+    height:33px;
+    display:none;
+}
+#ball_image {
+    position:absolute;
+    top:0;
+    left:0;
+    width:33px;
+    height:33px;
+    background-image:url(https://i.imgur.com/FcvhAVw.png);
+}
+#ball_direction {
+    position:absolute;
+    width:32px;
+    height:100px;
+    bottom:16px;
+    left:0;
+    -webkit-transform-origin: center bottom;
+    -moz-transform-origin: center bottom;
+    -ms-transform-origin: center bottom;
+    -o-transform-origin: center bottom;
+    transform-origin: center bottom;
+    background-image:url(https://i.imgur.com/VTONTxo.png);
+    -webkit-animation:directions 0.4s steps(10) infinite;
+    -moz-animation:directions 0.4s steps(10) infinite;
+    -ms-animation:directions 0.4s steps(10) infinite;
+    -o-animation:directions 0.4s steps(10) infinite;
+    animation:directions 0.4s steps(10) infinite;
+}
+@keyframes directions {
+    100% {background-position:-320px; }
+}
+.sticks {
+    position:absolute;
+    width:360px;
+    height:20px;
+    left:0;
+    top:25px;
+    background-image:url(https://i.imgur.com/nfZNbZ2.png);
+}
+.players_line {
+    position:absolute;
+    width:100%;
+    height:66px;
+    left:0;
+}
+.players {
+    position:absolute;
+    width:35px;
+    height:66px;
+    top:0;
+    background-image:url(https://i.imgur.com/Edwy37M.png);
+    display:none;
+}
+#goal {
+    position:absolute;
+    top:200px;
+    left:45px;
+    width:269px;
+    height:74px;
+    background-image:url(https://i.imgur.com/OA0rPNQ.png);
+    background-repeat:no-repeat;
+    background-size:1%;
+    background-position:center center;
+    display:none;
+}
+#instructions {
+    position:absolute;
+    top:10px;
+    left:10px;
+    width:320px;
+    height:365px;
+    border:2px solid #000000;
+    background-color:#ffffff;
+    padding:10px;
+    text-align:center;
+    font-size:18px;
+    font-weight:normal;
+}
+
+</style>
+<script>
+
+ 
+var ww = 0;
+var wh = 0;
+var left_ball = 130;
+var degrees;
+var playing = true;
+var direction_1,direction_2,direction_3;
+$(document).ready(function() {
+    ww = $(window).width();
+    wh = $(window).height();
+    $("#main").css({
+        "height":wh+"px"
+    });
+    $("#playagain").on("click",function() {
+        start();
+    });
+    $("#deg").on("input",function() {
+        degrees = $(this).val()*-1;
+        rotate_ball(degrees);
+    });
+    $("#deg").on("change",function() {
+        var kicks = parseInt($("#kicks").html())+1;
+        $("#kicks").html(kicks);
+        var ball_top = 330;
+        var ball_left = 130;
+        var value = $(this).val();
+        var degrees = 90-(value*-1);
+        var tangent = Math.tan(degrees*Math.PI/180);
+        $("#ball_direction,#deg").hide();
+        $("#ball").stop().animate({
+            "top":"0px"
+        },{
+            duration:600,
+            easing:"linear",
+            step:function() {
+                distance = ball_top - parseInt($(this).css("top"));
+                x = distance/tangent;
+                new_left = ball_left+x;
+                $("#ball").css("left",new_left+"px");
+                if ( new_left<=0 || new_left>265) {
+                    ball_left = new_left;
+                    ball_top = parseInt($(this).css("top"));
+                    value *= -1;
+                    degrees = degrees = 90-(value*-1);
+                    tangent = Math.tan(degrees*Math.PI/180);
+                }
+                ball_offset = $(this).offset();
+                $(".players").each(function() {
+                    player_offset = $(this).offset();
+                    if (collided(ball_offset,player_offset)) {
+                        playing=false;
+                        $("#ball").stop();
+                        fail();
+                        return false;
+                    }
+                });
+            },
+            complete:function() {
+                var final_left = parseInt($("#ball").css("left"));
+                if (final_left>=93 && final_left<=167) {
+                    goal();
+                } else {
+                    fail();
+                }
+            }
+        });
+    });
+});
+function collided(b_offset,p_offset) {
+    b_top = b_offset.top;
+    b_left = b_offset.left;
+    p_top = p_offset.top+66;
+    p_left = p_offset.left;
+    if ((b_left+33)>=p_left && b_left<=(p_left+35) &&
+        (((b_top)>=(p_top-20)) && ((b_top)<=(p_top)))) {
+        return true;
+    }
+    return false;
+}
+function goal() {
+    var goals = parseInt($("#goals").html())+1;
+    $("#goals").html(goals);
+    playing = false;
+    $("#ball").stop().animate({
+        "top":"-30px"
+    },{
+        duration:100,
+        easing:"linear",
+        complete: function() {
+            $("#goal").fadeTo(10,1,function() {
+                $("#goal").stop().animate({
+                    "background-size":"100%"
+                },{
+                    duration:600,
+                    easing:"linear",
+                    complete: function() {
+                        $("#playagain").show();
+                    }
+                });
+            });
+        }
+    });
+}
+function fail() {
+    playing = false;
+    var ball_top = parseInt($("#ball").css("top"));
+    $("#ball").stop().animate({
+        "top":(ball_top+50)+"px"
+    },{
+        duration:400,
+        easing:"linear",
+        complete: function() {
+            $("#playagain").show();
+        }
+    });
+}
+function rotate_ball(degrees) {
+    $("#ball_direction").css({
+        "-webkit-transform":"rotate("+degrees+"deg)",
+        "-moz-transform":"rotate("+degrees+"deg)",
+        "-ms-transform":"rotate("+degrees+"deg)",
+        "-o-transform":"rotate("+degrees+"deg)",
+        "transform":"rotate("+degrees+"deg)"
+    });
+}
+function start() {
+    $("#instructions").hide();
+    $("#goal").fadeTo(100,0,function() {
+        $("#goal").css("background-size","1%");
+    });
+    playing = true;
+    $("#playagain").html("الركل مجدداً").hide();
+    $("#ball,#ball_direction,#deg").show();
+    $("#deg").val(0);
+    rotate_ball(0);
+    $("#ball").css({
+        "top":"330px",
+        "left":"130px"
+    });
+    team = Math.floor(Math.random()*500)%2;
+    $(".players").each(function() {
+        bgp = $(this).css("background-position").split(" ");
+        bgp = bgp[0]+" "+(team*-66)+"px";
+        $(this).css("background-position",bgp);
+    });
+    pos = Math.floor(Math.random()*100)+50;
+    $("#players_line_2 .players:eq(0)").css({
+        "left":(pos)+"px"
+    });
+    $("#players_line_2 .players:eq(1)").css({
+        "left":(pos+140)+"px"
+    });
+    pos = Math.floor(Math.random()*100)+50;
+    $("#players_line_3 .players:eq(0)").css({
+        "left":(pos)+"px"
+    });
+    $("#players_line_3 .players:eq(1)").css({
+        "left":(pos+140)+"px"
+    });
+    $(".players").show();
+    direction_1 = Math.floor(Math.random()*500)%2;
+    direction_2 = Math.floor(Math.random()*500)%2;
+    direction_3 = Math.floor(Math.random()*500)%2;
+    move_players_1();
+    move_players_2();
+    move_players_3();
+}
+function move_players_1() {
+    if (playing) {
+        left_1 = (parseInt($("#players_line_1 .players:eq(0)").css("left"))+(direction_1===0?-1:1));
+        $("#players_line_1 .players:eq(0)").css("left",left_1+"px");
+        if (left_1>210) {
+            direction_1 = 0;
+        }
+        if (left_1<105) {
+            direction_1 = 1;
+        }
+        setTimeout(move_players_1,15);
+    }
+}
+function move_players_2() {
+    if (playing) {
+        left_2 = (parseInt($("#players_line_2 .players:eq(0)").css("left"))+(direction_2===0?-1:1));
+        $("#players_line_2 .players:eq(0)").css("left",left_2+"px");
+        $("#players_line_2 .players:eq(1)").css("left",(left_2+140)+"px");
+        if (left_2>150) {
+            direction_2 = 0;
+        }
+        if (left_2<=35) {
+            direction_2 = 1;
+        }
+        setTimeout(move_players_2,20);
+    }
+}
+function move_players_3() {
+    if (playing) {
+        left_3 = (parseInt($("#players_line_3 .players:eq(0)").css("left"))+(direction_3===0?-1:1));
+        $("#players_line_3 .players:eq(0)").css("left",left_3+"px");
+        $("#players_line_3 .players:eq(1)").css("left",(left_3+100)+"px");
+        if (left_3>190) {
+            direction_3 = 0;
+        }
+        if (left_3<=35) {
+            direction_3 = 1;
+        }
+        setTimeout(move_players_3,10);
+    }
+}
+
+</script>
