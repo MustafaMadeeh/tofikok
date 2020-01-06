@@ -1,0 +1,1061 @@
+<!-- Created by Dima Skakowski-->
+
+<!-- Created by Burey-->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SoloLearn Battle Royale</title>
+        <!--
+        By: Burey
+        Date: October 2018
+        Desc: Walking around using Firebase as a socket service
+        Usage: fun?
+        
+        sprites generated using:
+        http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/
+        -->
+        <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase.js"></script>
+        <script src="https://gitcdn.link/repo/bureyburey/bad-words-compact/master/bad-words-compact.min.js"></script>
+        <script src="https://gitcdn.link/repo/bureyburey/canvas-joystick/master/joystick.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    </head>
+    <body>
+        <div id="screen-1">
+            <h3>Click Image To Join the Server</h3>
+            <div id="join-form">
+                <input placeholder="Player Name:" id="name" />
+                <div class="styled-select blue semi-square">
+                <select id="gender">
+                    <option value="RANDOM">Random</option>
+                    <option value="SKELETON">Skeleton</option>
+                    <option value="HANK">Hank (M)</option>
+                    <option value="MAGE">Mage (M)</option>
+                    <option value="PRINCESS">Princess (F)</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="MALE">Male</option>
+                    <option value="PIXIE">Pixie (F)</option>
+                    <option value="ORC">Orc (M)</option>
+                    <option value="RED">Red (F)</option>
+                    <option value="KNIGHT_M">Knight (M)</option>
+                    <option value="KNIGHT_F">Knight (F)</option>
+                </select>
+                </div>
+                <button class="styled-button blue semi-square" onclick="viewChangelog()">Change Log</button>
+            </div>
+            <div id="MEADOW-users">Online Players: Loading...</div>
+            <img onclick="init(event)" name="MEADOW" src="https://png.pngtree.com/thumb_back/fw800/back_pic/04/06/04/56580ef06099bb9.jpg"/>
+            <div id="BEACH-users">Online Players: Loading...</div>
+            <img onclick="init(event)" name="BEACH" src="https://thumbs.dreamstime.com/t/top-view-sand-shells-starfish-flat-icon-design-beach-background-93492920.jpg"/>
+            <div id="GRASS-users">Online Players: Loading...</div>
+            <img onclick="init(event)" name="GRASS" src="https://img00.deviantart.net/c3f4/i/2011/353/a/a/mobile_game_background_by_disnie-d4jmrye.jpg"/>
+        </div>
+        
+        <div id="screen-2">
+            <canvas id="canvas" width="500" height="500" />
+        </div>
+        
+        <form autocomplete="off" id="chat-form">
+            <input placeholder="Message:" id="message" />
+            <button type="submit" onclick="sendMessage(event)">Send</button>
+            <button onclick="showPlayers(event)">Players</button>
+        </form>
+        <div id="debug" />
+        <script>
+function gUid() {
+    var S4 = function() {
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    };
+    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+}
+
+function log(msg, append) {
+    var debug = document.getElementById("debug");
+    msg = window.markdown.specToEntities(msg);
+    if(append){
+        debug.innerHTML = `<div>${msg}</div>${debug.innerHTML}`;
+    }
+    else{
+        debug.innerHTML = `<div>${msg}</div>`;
+    }
+}
+
+function bezierCurve(ctx, centerX, centerY, width, height,fillType) {
+// draws a single ellipse
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY - height / 2);
+
+    ctx.bezierCurveTo(
+        centerX + width / 2, centerY - height / 2,
+        centerX + width / 2, centerY + height / 2,
+        centerX, centerY + height / 2
+    );
+    ctx.bezierCurveTo(
+        centerX - width / 2, centerY + height / 2,
+        centerX - width / 2, centerY - height / 2,
+        centerX, centerY - height / 2
+    );
+    
+    ctx.closePath();
+    if(fillType==='fill')
+        ctx.fill();
+    else
+        ctx.stroke();
+}
+
+Array.prototype.find = Array.prototype.find || function(callback) {
+  if (this === null) {
+    throw new TypeError('Array.prototype.find called on null or undefined');
+  } else if (typeof callback !== 'function') {
+    throw new TypeError('callback must be a function');
+  }
+  var list = Object(this);
+  // Makes sures is always has an positive integer as length.
+  var length = list.length >>> 0;
+  var thisArg = arguments[1];
+  for (var i = 0; i < length; i++) {
+    var element = list[i];
+    if ( callback.call(thisArg, element, i, list) ) {
+      return element;
+    }
+  }
+};
+
+
+if(!Array.prototype.includes){Object.defineProperty(Array.prototype,'includes',{value:function(searchElement,fromIndex){if(this==null){throw new TypeError('"this" is null or not defined')}
+var o=Object(this);var len=o.length>>>0;if(len===0){return!1}
+var n=fromIndex|0;var k=Math.max(n>=0?n:len-Math.abs(n),0);function sameValueZero(x,y){return x===y||(typeof x==='number'&&typeof y==='number'&&isNaN(x)&&isNaN(y))}
+while(k<len){if(sameValueZero(o[k],searchElement)){return!0}
+k++}
+return!1}})};
+
+
+window.markdown = {
+    // Michael Ermishin's Markdown module
+    htmlEntitiesMap: {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+        ' ': '&nbsp;'
+    },    
+    specToEntities: function(text) {
+    if(text[0]==="$"){return text.replaceAll('$','')}
+        var pattern = new RegExp('[' + Object.keys(this.htmlEntitiesMap).join('') + ']', 'g');
+        return text.replace(pattern, function (m) {
+            return markdown.htmlEntitiesMap[m];
+        });
+    },
+    entitiesToSpec: function(text) {
+        var entToSpecMap = Object.keys(this.htmlEntitiesMap).reduce(function(obj, key) {
+            obj[markdown.htmlEntitiesMap[key]] = key;
+            return obj;
+        }, {});
+
+        var pattern = new RegExp(Object.keys(entToSpecMap).join('|'), 'g');
+        return text.replace(pattern, function (m) {
+            return entToSpecMap[m];
+        });
+    }
+};
+
+function viewChangelog(){
+    alert("Change Log:\n\n8/10/2018 - Initial release:\n- walk around on the beach\n- Male, Female avatars added\n- messages displayed above player avatar\n\n9/10/2018 - Features added:\n- SLASH attack pattern added\n- battle system added\n- chat history added\n\n10/10/2018 - Features added:\n- DIE animation pattern added\n- Orc avatar added (Amr Attia)\n- Knight avatar added (Vlogger Matt)\n- Pixie avatar added (Rowsej)\n\n11/10/2018 - Features added:\n- GRASS background added\n- HP bar added\n- random names replaced the default 'Anonymous User'\n- Princess avatar added (Rowsej)\n- STAB attack pattern added (Rowsej)\n- Red avatar added (Burey)\n- Mage avatar added (LONGTIE👔)\n- MAGIC attack pattern added\n- Hank avatar added (Burey)\n- BIG_SWORD attack pattern added\n- change log added (suggested by Vlogger Matt)\n\n12/10/2018 - Features added:\n- fainted players respawn at a random position on the top\n- enabled attack while using the joystick (mobile)\n- MEADOW background added\n- auto kick players who uses profanity in chat\n\n13/10/2018 - Features added:\n- Skeleton avatar added (Vlogger Matt)\n- added logged player list\n\n17/10/2018 - Features added:\n- added online players count in server on main screen\n\n24/10/2018 - Features added:\n- SPEAR attack pattern added\n- Female Knight avatar added (Gordon Chan)");
+}
+
+
+function randVal(min, max){
+    return Math.floor(Math.random() * (max - min) + min);
+}
+        </script>
+    </body>
+</html>
+
+
+
+<script>
+    
+    // Created by Dima Skakowski
+
+// Created by Burey
+
+'use strict';
+var filter = new Filter();
+
+// welcome messages to be displayed upon connecting
+var welcomeMessages = ["Welcome to", "SoloLearn Battle Royale", "• Tap on screen to attack", "• Use the joystick to move"];
+var welcomeMessagesFrames = 50;
+
+var WALK = "WALK", ACTION = "ACTION", SLASH = "SLASH", STAB = "STAB", MAGIC = "MAGIC", BIG_SWORD = "BIG_SWORD", SPEAR = "SPEAR" , DIE = "DIE", REVIVE = "REVIVE";
+
+var SPRITES = {
+    "MALE": {
+        url:"https://i.imgur.com/Ohe9jMp.png",
+        attack: SLASH
+    },
+    "FEMALE": {
+        url: "https://i.imgur.com/1Ijv1OJ.png",
+        attack: SLASH
+    },
+    "ORC": {
+        url: "https://i.imgur.com/vsn0EYQ.png",
+        attack: SLASH
+    },
+    "KNIGHT_M":{
+        url: "https://i.imgur.com/fka32MZ.png",
+        attack: SLASH
+    },
+    "KNIGHT_F":{
+        url: "https://i.imgur.com/P1OOh5D.png",
+        attack: SPEAR
+    },
+    "PIXIE": {
+        url: "https://i.imgur.com/wnRIs5G.png",
+        attack: SLASH
+    },
+    "RED": {
+        url: "https://i.imgur.com/M5Z0Ros.png",
+        attack: STAB
+    },
+    "MAGE": {
+        url: "https://i.imgur.com/zbqNOWw.png",
+        attack: MAGIC
+    },
+    "PRINCESS": {
+        url: "https://i.imgur.com/DcQJEdW.png",
+        attack: STAB
+    },
+    "HANK": {
+        url: "https://i.imgur.com/1w6kCt9.png",
+        attack: BIG_SWORD
+    },
+    "SKELETON": {
+        url: "https://i.imgur.com/m99kekZ.png",
+        attack: BIG_SWORD
+    }
+}
+
+var SERVERS = {
+    "BEACH": {
+        url: "https://todo-tutorial-de017.firebaseio.com",
+        bg:"https://thumbs.dreamstime.com/t/top-view-sand-shells-starfish-flat-icon-design-beach-background-93492920.jpg"
+    },
+    "GRASS": {
+        url: "https://crud-tutorial.firebaseio.com",
+        bg: "https://img00.deviantart.net/c3f4/i/2011/353/a/a/mobile_game_background_by_disnie-d4jmrye.jpg",
+    },
+    "MEADOW": {
+        url: "https://battle-royale-7ca4f.firebaseio.com",
+        bg: "https://png.pngtree.com/thumb_back/fw800/back_pic/04/06/04/56580ef06099bb9.jpg"
+    }
+}
+
+function getUserCount(serverName, cb){
+   var CORS = "https://cors-anywhere.herokuapp.com"; axios.get(`${CORS}/${SERVERS[serverName].url}/connected.json`).then(function(response){
+       
+       cb(serverName, response.data);
+    }).catch(function(err){
+        console.log(err);
+        cb(serverName, null);
+        clearInterval(connectedInterval);
+    });
+}
+
+function setConnectedUsers(serverName, data){
+    var count = data ? Object.keys(data).length : 0;
+    var conDiv = document.getElementById(`${serverName}-users`);
+    conDiv.innerHTML = `Online Players: ${count}`;
+}
+
+function getUserCounts(){
+    function check(){
+        getUserCount("MEADOW", setConnectedUsers);
+        getUserCount("BEACH", setConnectedUsers);
+        getUserCount("GRASS", setConnectedUsers);
+    }
+    check();
+    connectedInterval = setInterval(check, 5000);
+}
+
+window.onload = getUserCounts;
+
+
+var FRAMES = "FRAMES", UP = "UP", LEFT = "LEFT", DOWN = "DOWN", RIGHT = "RIGHT", STATIC = "STATIC";
+
+var SPRITE_MAP = {
+    MAGIC:{
+        FRAMES: 7,
+        UP: 0,
+        LEFT: 1,
+        DOWN: 2,
+        RIGHT: 3,
+        STATIC: 2
+    },
+    WALK:{
+        FRAMES: 9,
+        UP: 8,
+        LEFT: 9,
+        DOWN: 10,
+        RIGHT: 11,
+        STATIC: 10
+    },
+    SLASH:{
+        FRAMES: 6,
+        UP: 12,
+        LEFT: 13,
+        DOWN: 14,
+        RIGHT: 15,
+        STATIC: 14
+    },
+    STAB:{
+        FRAMES: 8,
+        UP: 4,
+        LEFT: 5,
+        DOWN: 6,
+        RIGHT: 7,
+        STATIC: 6
+    },
+    DIE:{
+        FRAMES: 6,
+        UP: 20,
+        LEFT: 20,
+        DOWN: 20,
+        RIGHT: 20,
+        STATIC: 20
+    },
+    BIG_SWORD:{
+        FRAMES: 6,
+        UP: 22,
+        LEFT: 25,
+        DOWN: 28,
+        RIGHT: 31,
+        STATIC: 28
+    },
+    SPEAR:{
+        FRAMES: 8,
+        UP: 22,
+        LEFT: 25,
+        DOWN: 28,
+        RIGHT: 31,
+        STATIC: 28
+    }
+}
+
+var SPRITE_W = 64;
+var SPRITE_H = 64;
+var JOIN = "JOIN";
+var DELTA = "DELTA";
+var UPDATE = "UPDATE";
+var MESSAGE = "MESSAGE";
+var ATTACK = "ATTACK";
+var ADD_KILL = "ADD_KILL";
+var RECOVER_HP = "RECOVER_HP";
+
+var BORDER_LEFT = 0, BORDER_RIGHT = 0, BORDER_BOTTOM = 0, BORDER_TOP = 0;
+
+var DEFAULT_DAMAGE = 10;
+var canvas;
+var ctx;
+var myPlayer;
+var joystick;
+var fpsInterval = 1000 / 8;
+var dbRef;
+var dataRef;
+var conRef;
+var COLLECTION_DELTAS = "deltas";
+var MAX_DELTAS = 5;
+var players = [];
+var name = "";
+var onlineUsers = [];
+var now;
+var then = new Date();
+var gender = "MALE";
+var selectedBG = "BEACH";
+var connectedInterval;
+
+function clearDB(){
+    dataRef.set(null);
+}
+
+function init(evt) {
+    if(!validUsername(document.getElementById("name").value)){
+        return;
+    }
+    
+    clearInterval(connectedInterval);
+    
+    selectedBG = evt.target.name;
+
+    firebase.initializeApp({
+        databaseURL: SERVERS[selectedBG].url
+    });
+
+    setPlayer(evt);
+    
+    initFirebase();
+    initFirebaseReferences();
+    initFirebaseListeners();
+    clearDB();
+
+    canvas = document.getElementById("canvas");
+    ctx = canvas.getContext("2d");
+    setTimeout(function(){
+        canvas.style.height = `${window.innerHeight*0.9}px`;
+        BORDER_LEFT = -50;
+        BORDER_RIGHT = canvas.width + 50;
+        BORDER_BOTTOM = canvas.height + 50;
+        BORDER_TOP = -50;
+    }, 500);
+    
+    canvas.style.backgroundImage = `url(${SERVERS[selectedBG].bg})`;
+    
+    joystick = new Joystick({stickBg: "transparent", stickBgColor:"black", stickColor: "red", stickOpacity: "0.5"});
+    join();
+    setOnlinePlayer();
+    
+    requestAnimationFrame(gameLoop);
+}
+
+function setPlayer(evt) {
+    evt.preventDefault();
+    
+    name = document.getElementById("name").value || usernames[randVal(0, usernames.length - 1)];
+    
+    gender = document.getElementById("gender").value;
+    
+    if(gender === "RANDOM"){
+        gender = Object.keys(SPRITES)[randVal(0, Object.keys(SPRITES).length)];
+    }
+    
+    document.getElementById("chat-form").style.display = "flex";
+    
+    document.getElementById("screen-1").style.display = "none";
+    
+    document.getElementById("screen-2").style.display = "flex";
+}
+
+function validUsername(name){
+    if(name.indexOf(':') !== -1){
+        alert(`Username cannot contain ':'`);
+        return false;
+    }
+    return true;
+}
+
+function setOnlinePlayer() {
+    // add user to the logged users list
+    // access special reference for presence management
+    var isOnline = dbRef.ref('.info/connected');
+    var playerWithId = `${myPlayer.name}:${myPlayer.id}:${gender}`;
+    // create reference with the username
+    var connectedPlayer = firebase.database().ref('/connected/' + playerWithId);
+    
+    // create listener when new user is logged in
+    isOnline.on('value', function(snapshot) {
+        if (!snapshot.val()) return;
+        // remove the user on disconnect event
+        connectedPlayer.onDisconnect().remove();
+        // set the user in the connected users list in the DB
+        connectedPlayer.set(firebase.database.ServerValue.TIMESTAMP);
+    });
+}
+
+function join(){
+    myPlayer = new Player(ctx, SPRITES[gender], null, name, joystick);
+    players.push(myPlayer);
+
+    myPlayer.listen();
+    
+    function attackFunc(){
+        if(myPlayer.actionFrames > 0){
+            return;
+        }
+        sendData({
+            type: ACTION,
+            action: myPlayer.attackType,
+            damage: 10,
+            uid: myPlayer.id,
+            name: myPlayer.name,
+            x: myPlayer.x * SPRITE_W + SPRITE_W * 0.5,
+            y: myPlayer.y + SPRITE_H * 0.7,
+            direction: myPlayer.direction,
+        });
+    }
+
+    canvas.addEventListener("touchstart", attackFunc);
+    canvas.addEventListener("click", attackFunc);
+}
+
+function gameLoop() {
+    now = Date.now();
+    var elapsed = now - then;
+
+    if (elapsed > fpsInterval) {
+        then = now - (elapsed % fpsInterval);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        players.sort(function(p1, p2){
+            return p1.y - p2.y;
+        });
+        for (var i = 0; i < players.length; i++) {
+            players[i].draw();
+        }
+        
+        if(welcomeMessagesFrames){
+        console.log()
+            ctx.globalAlpha = welcomeMessagesFrames * 100 / 50/ 100;
+            welcomeMessagesFrames--;
+            ctx.fillStyle = "blue";
+            ctx.font = "30px Arial";
+            for (var i = 0; i < welcomeMessages.length; i++) {
+                ctx.fillText(welcomeMessages[i], canvas.width / 2 - 120, 30 + 30*i);
+            }
+            ctx.font = "12px Arial";
+        }
+    }
+
+    requestAnimationFrame(gameLoop);
+}
+
+function checkHit(data){
+    var attackingPlayer = players.find(function(p){
+        return p.id === data.uid;
+    });
+    
+    for (var i = 0; i < players.length; i++) {
+        var p = players[i];
+        var x = p.x * SPRITE_W + SPRITE_W * 0.5;
+        var y = p.y + SPRITE_H * 0.7;
+        
+        if(Math.abs(x - data.x) < 50 && Math.abs(y - data.y) < 50 && p.id !== data.uid && p.hp > 0){
+            p.takeDamage(data);
+            if(p.hp <= 0){
+                sendData({
+                    type: ACTION,
+                    action: DIE,
+                    uid: p.id,
+                    name: p.name,
+                    x: p.x,
+                    y: p.y,
+                    direction: p.direction
+                });
+                if(attackingPlayer){
+                    attackingPlayer.addKill(data);
+                }
+            }
+        }
+    }
+}
+
+function updatePlayer(data) {
+    //console.log(JSON.stringify(data, null, 2))
+    //log(JSON.stringify(data, null, 2));
+
+    var playerToUpdate = players.find(function(p) {
+        return p.id === data.uid;
+    });
+    
+    if (playerToUpdate) {
+        switch(data.type){
+            case DELTA:
+                playerToUpdate.update(data);
+            break;
+            case MESSAGE:
+                if(filter.isProfane(data.message)){
+                    var id = `${data.name}:${data.uid}:${data.gender}`;
+                    
+                    dbRef.ref('/connected/' + id).set(null);
+                    data.message = KICKED;
+                }
+                data.message = filter.clean(data.message);
+                playerToUpdate.messageStart(data);
+                log(`${playerToUpdate.name}: ${data.message}`, true);
+            break;
+            case ACTION:
+            
+                playerToUpdate.actionStart(data);
+                if([SLASH, STAB, MAGIC, SPEAR, BIG_SWORD].includes(data.action)){
+                    checkHit(data);
+                }
+            break;
+            case REVIVE:
+                playerToUpdate.hp = 100;
+                playerToUpdate.currentAction = WALK;
+                playerToUpdate.y = 0;
+                playerToUpdate.x = randVal(0, canvas.width / SPRITE_W);
+            break;
+            case ADD_KILL:
+                playerToUpdate.addKill(data);
+            break;
+            default:
+            break;
+        }    
+    }
+}
+
+function onError(err) {
+    // error handler function (logs the error to console)
+    console.log(err);
+}
+
+// FIREBASE INITIALIZATION
+function initFirebase() {
+    // force firebase to use websockets
+    firebase.database.INTERNAL.forceWebSockets();
+    // create reference to the firebase database
+    dbRef = firebase.database();
+}
+
+function initFirebaseReferences() {
+    // reference to the deltas collection
+    dataRef = dbRef.ref(`${COLLECTION_DELTAS}`);
+    conRef = dbRef.ref("connected");
+}
+
+function initFirebaseListeners() {
+
+    dataRef.on("child_added", getData, onError);
+    //dataRef.orderByChild('timestamp').limitToLast(MAX_DELTAS).once('value', getAllData, onError);
+    // set listener for new notifications
+
+    // set listener for new connected user
+    conRef.on('value', updateOnlineUsers);
+    
+}
+
+function updateOnlineUsers(snapshot) {
+    // reset the current online users list
+    onlineUsers = [];
+    // get the new updated connected users list
+    snapshot.forEach(function(child) {
+        var nameWithId = child.key;
+        onlineUsers.push({
+            name: nameWithId.split(":")[0],
+            uid: nameWithId.split(":")[1],
+            gender: nameWithId.split(":")[2],
+            time: child.val()
+        });
+    });
+    
+    for(var i = onlineUsers.length - 1; i >=0; i--){
+        var user = onlineUsers[i];
+        if(!players.find(function(p){
+            return p.id === user.uid;
+        })){
+            var newPlayer = new Player(ctx, SPRITES[user.gender], user.uid, filter.clean(user.name), null);
+            players.push(newPlayer);
+        }
+    }
+    
+    var leavingPlayers = players.filter(function(p){
+        return !onlineUsers.find(function(u){
+            return u.uid === p.id;
+        });
+    });
+    
+    for(var i = 0; i < leavingPlayers.length; i++){
+        var p = leavingPlayers[i];
+        log(`${p.name} Has Left`, true);
+    }
+    
+    players = players.filter(function(p){
+        return onlineUsers.find(function(u){
+            return u.uid === p.id;
+        });
+    });
+}
+
+function showPlayers(evt){
+    evt.preventDefault();
+    var loggedPlayers = onlineUsers.map(function(u){
+        return `${u.gender}: ${u.name}`;
+    }).join("\n");
+    alert(`Logged Players:\n\n${loggedPlayers}`);
+}
+
+function getDataSnapshot(child) {
+    // returns an object built from a snapshot child to send to the drawing function
+    var data = child.val();
+    
+    return data;
+    
+    return {
+        id: child.key,
+        newPlayer: data.newPlayer,
+        type: data.type,
+        action: data.action,
+        damage: data.damage,
+        hp: data.hp,
+        uid: data.uid,
+        name: data.name,
+        gender: gender,
+        message: data.message,
+        deltaX: data.deltaX,
+        deltaY: data.deltaY,
+        x: data.x,
+        y: data.y,
+        killCount: data.killCount,
+        spriteUrl: data.spriteUrl,
+        direction: data.direction,
+        timestamp: data.timestamp,
+    }
+}
+
+function getData(snapshot) {
+    // retrieves the new line from the database, build a line object and pass on to a handling function
+    var data = null;
+    try {
+        data = getDataSnapshot(snapshot);
+        updatePlayer(data);
+    } catch (err) {}
+}
+
+function getAllData(snapshot) {
+    snapshot.forEach(function(child) {
+        var data = null;
+        try {
+            data = getDataSnapshot(child);
+            updatePlayer(data);
+        } catch (err) {}
+    });
+}
+
+function sendData(data) {
+    dataRef.push(data);
+}
+
+function sendMessage(evt){
+    evt.preventDefault();
+    var messageInput = document.getElementById("message");
+    if(!messageInput.value){
+        return;
+    }
+    sendData({
+        type: MESSAGE,
+        uid: myPlayer.id,
+        name: name,
+        gender: gender,
+        message: messageInput.value
+    });
+    messageInput.value = "";
+}
+
+class Player {
+    constructor(ctx, sprite, id, name, joystick) {
+        this.id = id || gUid();
+        this.name = name;
+        this.hp = 100;
+        this.killCount = 0;
+        this.ctx = ctx;
+        this.spriteUrl = sprite.url;
+        this.attackType = sprite.attack;
+        this.sprite = new Image();
+        this.sprite.src = sprite.url;
+        this.currentFrame = 0;
+        this.animRowStart = 8;
+        this.x = 0;
+        this.y = 0;
+        this.direction = "UP";
+        this.joystick = joystick;
+        this.then = new Date();
+        this.rowFrames = 6;
+        this.action = true;
+        this.message = null;
+        this.messageFrames = 0;
+        this.actionFrames = 0;
+        this.currentAction = WALK;
+        this.listen = this.listen.bind(this);
+    }
+
+    draw() {
+        var sx = SPRITE_W;
+        var sy = SPRITE_H;
+        var sw = SPRITE_W;
+        var sh = SPRITE_H;
+        var dx = sw;
+        var dy = sh;
+        var dw = sw;
+        var dh = sh;
+
+        // draw shadow
+        this.ctx.fillStyle = "black";
+        this.ctx.globalAlpha = 0.2;
+        bezierCurve(this.ctx, this.x * dx + sw / 2, this.y + sh - 5, sw, sh * 0.3, "fill");
+        this.ctx.globalAlpha = 1.0;
+        
+        // update values to display big sword/spear animation (bigger sprites)
+        var bigSprite = (this.attackType === SPEAR && this.currentAction === SPEAR) || (this.attackType === BIG_SWORD && this.currentAction === BIG_SWORD);
+        
+        var spearMultiplier = bigSprite ? 3:1;
+        var spearAdder =  bigSprite ? -64:0;
+        
+        // draw current player frame
+        this.ctx.drawImage(
+            this.sprite, // img
+            this.currentFrame * sx * spearMultiplier, // source x
+            (this.animRowStart) * sy, // source y
+            sw * spearMultiplier, // source width
+            sh * spearMultiplier, // source height
+            this.x * dx + spearAdder, // dx
+            this.y, // dy
+            dw * spearMultiplier, // dw
+            dh * spearMultiplier // dy
+        );
+        
+        // draw player name
+        this.ctx.fillStyle = "red";
+        this.ctx.fillText(this.name, this.x * dx + sw * 0.3, this.y + sh + 10);
+        
+        // draw player HP
+        if(this.hp > 0){
+            this.ctx.fillText(this.killCount, this.x * dx, this.y + 20);
+            this.ctx.fillStyle = this.hp > 30 ? "green":"red";
+            this.ctx.fillRect(this.x * dx, this.y + 5, 60 * this.hp / 100, 5);
+        }
+        
+        // draw message
+        if(this.messageFrames > 0){
+            this.ctx.fillStyle = "black";
+            this.ctx.fillText(`${this.message}`, this.x * dx + sw * 0.3, this.y);
+            this.messageFrames--;
+        }
+        
+        // update current frame for special actions (other then WALK)
+        if (this.actionFrames > 0) {
+            this.currentFrame = (this.currentFrame+1) % SPRITE_MAP[this.currentAction][FRAMES];
+            this.actionFrames--;
+            // special action ended -> revert to WALK
+            if(this.actionFrames === 0){
+                if(this.currentAction === DIE){
+                    sendData({
+                        type: REVIVE,
+                        uid: this.id
+                    });
+                }
+                this.currentAction = WALK;
+                this.updateDirectionSprite();
+            }
+        }
+    }
+
+    updateDirectionSprite() {
+        this.animRowStart = SPRITE_MAP[this.currentAction][this.direction];
+    }
+
+    update(data) {
+        this.x = data.x || this.x;
+        this.y = data.y || this.y;
+        this.killCount = data.killCount || this.killCount;
+        this.x += data.deltaX || 0;
+        this.y += data.deltaY || 0;
+        this.hp = Math.min(data.hp, 100);
+        this.direction = data.direction || this.direction;
+        if(data.action === UPDATE){
+            this.currentFrame = ++this.currentFrame % SPRITE_MAP[this.currentAction][FRAMES];
+        }
+        this.updateDirectionSprite();
+    }
+    
+    messageStart(data){
+        this.message = data.message;
+        this.messageFrames = data.message.length * 50;
+    }
+
+    actionStart(data){
+        this.currentAction = data.action;
+        this.actionFrames = SPRITE_MAP[this.currentAction][FRAMES];
+        this.currentFrame = 0;
+        this.animRowStart = SPRITE_MAP[this.currentAction][this.direction];
+    }
+    
+    takeDamage(data){
+        //this.hp -= data.damage;
+        this.hp -= DEFAULT_DAMAGE;
+    }
+    
+    addKill(data){
+        this.killCount++;
+    }
+    
+    revive(data){
+        this.hp = 100;
+        this.currentAction = WALK;
+    }
+
+    listen() {
+        var x = this.x;
+        var y = this.y;
+        var dx = this.joystick.deltaX() * 0.005;
+        var dy = this.joystick.deltaY() * 0.3;
+        var direction = this.joystick.direction();
+        
+        // teleport out of bound player to the oppositr side
+        if(x * SPRITE_W < BORDER_LEFT && direction === LEFT){
+            x = BORDER_RIGHT / SPRITE_W;
+        }
+        else if(x * SPRITE_W > BORDER_RIGHT && direction === RIGHT){
+            x = BORDER_LEFT / SPRITE_W;
+        }
+        else if(y > BORDER_BOTTOM && direction === DOWN){
+            y = BORDER_TOP;
+        }
+        else if(y < BORDER_TOP && direction === UP){
+            y = BORDER_BOTTOM;
+        }
+        
+        this.now = Date.now();
+        var elapsed = this.now - this.then;
+
+        if (elapsed > fpsInterval) {
+            this.then = this.now - (elapsed % fpsInterval);
+            
+            if ((dx || dy) && this.actionFrames <= 0) {
+                this.currentFrame = ++this.currentFrame % SPRITE_MAP[this.currentAction][FRAMES];
+                
+                sendData({
+                    type: DELTA,
+                    action: UPDATE,
+                    uid: this.id,
+                    name: this.name,
+                    deltaX: dx,
+                    deltaY: dy,
+                    x: x,
+                    y: y,
+                    hp: this.hp,
+                    killCount: this.killCount,
+                    direction: direction
+                });
+            }
+            else if(this.currentAction !== DIE){
+                sendData({
+                    type: DELTA,
+                    action: RECOVER_HP,
+                    uid: this.id,
+                    name: this.name,
+                    deltaX: dx,
+                    deltaY: dy,
+                    x: x,
+                    y: y,
+                    hp: this.hp + 0.2,
+                    killCount: this.killCount,
+                    direction: direction
+                });
+                
+            }
+        }
+        requestAnimationFrame(this.listen);
+    }
+}
+var KICKED = "Been kicked due to profanity";
+// names generated using https://www.fantasynamegenerators.com/username-generator.php
+var usernames = ["Brutea","Knightlife","Tsardine","Patrio","LaughingMantis","HammerRhino","BlandSage","VirtualMallard","SmartWarlock","CopperDeer","Gringoliath","Coalossus","Weaselfie","Gorillamp","PlayGoddess","MusicalSalmon","IcyGenie","VainChimpanzee","PalePhoenix","EcstaticHydra","Patrio","Geckoco","Hoverlord","Rhinocerious","RichDog","ChillyShade","BruisedHoglet","MaskedGoat","FearlessSalmon","PeaceGirl","Ghostrich","Emufasa","Parascythe","Herogue","GummyWerewolf","HollowDevil","LaughingPig","CheatGeneral","AcrobaticDunker","GothicShadow","Sheeple","Scampirate","Sellamander","Amighost","AfternoonCentaur","GentleIncubus","ComplexFledgling","SubtleFox","FlashyColonel","Leopardon","Priestar","MammothMoth","Muskunk","LaughingHyena","MotherBlizzard","ClumsyGrin","SeaMacaw","AdorablePiggy","ImpulseDaemon","Capeshifter","Recyclops","Rhinocerious","Numbat","WorthyOrange","BabyTermite","BraveBaby","ElderVillain","GracefulBat","HomeCod"];
+
+
+</script>
+
+<style>
+    
+    /* Created by Dima Skakowski */
+
+/* Created by Burey */
+
+body {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently */
+    background: black;
+}
+h3{
+    color: white;
+    text-align: center;
+}
+#screen-1{
+    display: flex;
+    flex-direction: column;
+}
+
+#screen-1 div{
+    width: 95vw;
+    color: white;
+}
+
+#screen-1 img{
+    height: 30vw;
+    margin: 2px 0;
+    border-radius: 5px;
+}
+
+#screen-2{
+    display: none;
+}
+
+#debug{
+    color: white;
+    display: flex;
+    flex-direction: column;
+    width: 95vw;
+    word-break: break-all;
+}
+
+#debug > div:nth-child(even){
+    background: grey;
+}
+
+#canvas {
+    width: 95vw;
+    /*height: 90vh;*/
+    border:1px solid red;
+    background: no-repeat center center fixed;
+    background-size: cover;
+}
+
+#chat-form{
+    display: none;
+}
+
+#chat-form > input{
+    flex: 1;
+}
+
+#join-form{
+    display: flex;
+}
+
+.blue { background-color: #3b8ec2; }
+
+.styled-select, .styled-button {
+   height: 29px;
+   overflow: hidden;
+   width: 240px;
+   margin: 0 1px;
+}
+
+.styled-select select {
+   background: transparent;
+   border: none;
+   font-size: 12px;
+   height: 29px;
+   padding: 5px; /* If you add too much padding here, the options won't show in IE */
+   width: 268px;
+   color: white;
+}
+
+.styled-button{
+   border: none;
+   font-size: 10px;
+   height: 29px;
+   padding: 5px; /* If you add too much padding here, the options won't show in IE */
+   width: 268px;
+   color: white;
+}
+
+.semi-square {
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+}
+
+</style>
