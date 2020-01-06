@@ -1,11 +1,8 @@
-<!-- Created by Dima Skakowski-->
-
-<!-- Created by Burey-->
 
 <!DOCTYPE html>
 <html>
     <head>
-        <title>SoloLearn Battle Royale</title>
+        <title>war</title>
         <!--
         By: Burey
         Date: October 2018
@@ -22,12 +19,12 @@
     </head>
     <body>
         <div id="screen-1">
-            <h3>Click Image To Join the Server</h3>
+            <h3>اختر سيرفر اللعبة</h3>
             <div id="join-form">
                 <input placeholder="Player Name:" id="name" />
                 <div class="styled-select blue semi-square">
                 <select id="gender">
-                    <option value="RANDOM">Random</option>
+                    <option value="RANDOM">اسم عشوائي</option>
                     <option value="SKELETON">Skeleton</option>
                     <option value="HANK">Hank (M)</option>
                     <option value="MAGE">Mage (M)</option>
@@ -41,13 +38,14 @@
                     <option value="KNIGHT_F">Knight (F)</option>
                 </select>
                 </div>
-                <button class="styled-button blue semi-square" onclick="viewChangelog()">Change Log</button>
+      
+      
             </div>
-            <div id="MEADOW-users">Online Players: Loading...</div>
+            <div id="MEADOW-users">المتواجدين: جاري تحميل...</div>
             <img onclick="init(event)" name="MEADOW" src="https://png.pngtree.com/thumb_back/fw800/back_pic/04/06/04/56580ef06099bb9.jpg"/>
-            <div id="BEACH-users">Online Players: Loading...</div>
+            <div id="BEACH-users">المتصلين: جاري التحميل...</div>
             <img onclick="init(event)" name="BEACH" src="https://thumbs.dreamstime.com/t/top-view-sand-shells-starfish-flat-icon-design-beach-background-93492920.jpg"/>
-            <div id="GRASS-users">Online Players: Loading...</div>
+            <div id="GRASS-users">المتصلين: جاري التحميل...</div>
             <img onclick="init(event)" name="GRASS" src="https://img00.deviantart.net/c3f4/i/2011/353/a/a/mobile_game_background_by_disnie-d4jmrye.jpg"/>
         </div>
         
@@ -57,8 +55,8 @@
         
         <form autocomplete="off" id="chat-form">
             <input placeholder="Message:" id="message" />
-            <button type="submit" onclick="sendMessage(event)">Send</button>
-            <button onclick="showPlayers(event)">Players</button>
+            <button type="submit" onclick="sendMessage(event)">ارسال</button>
+            <button onclick="showPlayers(event)">اللاعبين</button>
         </form>
         <div id="debug" />
         <script>
@@ -172,8 +170,6 @@ function randVal(min, max){
     </body>
 </html>
 
-
-
 <script>
     
     // Created by Dima Skakowski
@@ -184,7 +180,7 @@ function randVal(min, max){
 var filter = new Filter();
 
 // welcome messages to be displayed upon connecting
-var welcomeMessages = ["Welcome to", "SoloLearn Battle Royale", "• Tap on screen to attack", "• Use the joystick to move"];
+var welcomeMessages = [ "• ابداء بالقتال"];
 var welcomeMessagesFrames = 50;
 
 var WALK = "WALK", ACTION = "ACTION", SLASH = "SLASH", STAB = "STAB", MAGIC = "MAGIC", BIG_SWORD = "BIG_SWORD", SPEAR = "SPEAR" , DIE = "DIE", REVIVE = "REVIVE";
@@ -265,7 +261,7 @@ function getUserCount(serverName, cb){
 function setConnectedUsers(serverName, data){
     var count = data ? Object.keys(data).length : 0;
     var conDiv = document.getElementById(`${serverName}-users`);
-    conDiv.innerHTML = `Online Players: ${count}`;
+    conDiv.innerHTML = `المتصلين: ${count}`;
 }
 
 function getUserCounts(){
