@@ -1,0 +1,215 @@
+<!-- Created by Clever Programmer-->
+
+<html>
+    <head> <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <meta charset="utf-8">
+    </head>
+<header>
+  <h1 class="logo">ألالعاب</h1>
+  <input type="checkbox" id="nav-toggle" class="nav-toggle">
+  <nav>
+    <ul>
+      <li><a href="#">الرئيسية</a></li>
+   
+      <li><a href="#">الألعاب</a>
+          <ul><li><a href="r.html">صاروخ 69</a></li>
+               <li><a href="snake.html">الأفعى</a></li>
+               <li><a href="color.html">مطابقة الألوان</a></li>
+               <li><a href="jum.html">تشغيل الضوء</a></li>
+               <li><a href="hit.html">الأسهم</a></li>
+               <li><a href="card.html">مطايقة البطاقات</a></li>
+                <li><a href="aratar.html">أنشاء شخصية</a></li>
+          </ul> 
+              
+          
+  
+  </nav>
+   <!-- THIS WILL MAKE A TOGGLE ICON -->
+  <label for="nav-toggle" class="nav-toggle-label">
+    <span></span>
+  </label>
+</header>
+
+
+<div class="content">
+  <h2>أستمتع وشارك</h2>
+</div>
+</html>
+
+
+
+
+<style>
+    /* Created by Clever Programmer */
+
+@import url('https://fonts.googleapis.com/css?family=Quicksand:400,700');
+:root {
+  --background: rgba(0, 214, 170, .85);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #222;
+  font-family: 'Quicksand', sans-serif;
+}
+
+.content {
+  height: 200vh;
+  background-color: #333;
+  display: grid;
+  place-items: center;
+}
+
+
+/* navigation styles */
+header {
+  background: var(--background);
+  text-align: center;
+  position: fixed;
+  z-index: 999;
+  width: 100%;
+}
+
+.nav-toggle {
+  display: none;
+}
+
+.nav-toggle-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-left: 1em;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.nav-toggle-label span,
+.nav-toggle-label span::before,
+.nav-toggle-label span::after {
+  display: block;
+  background: white;
+  height: 2px;
+  width: 2em;
+  border-radius: 2px;
+  position: relative;
+  transition: transform 0.4s ease-in-out;
+}
+.nav-toggle-label span::before,
+.nav-toggle-label span::after {
+  content: '';
+  position: absolute;
+}
+.nav-toggle-label span::before {
+  bottom: 7px;
+}
+.nav-toggle-label span::after {
+  top: 7px;
+}
+.nav-toggle:checked ~ .nav-toggle-label span {
+  transform: rotate(45deg);
+}
+.nav-toggle:checked ~ .nav-toggle-label span::before {
+  opacity: 0;
+}
+.nav-toggle:checked ~ .nav-toggle-label span::after {
+  transform: translateY(-7px) rotate(-90deg);
+}
+
+nav {
+  position: absolute;
+  text-align: left;
+  top: 100%;
+  left: 0;
+  background: var(--background);
+  width: 100%;
+  transform: scale(1, 0);
+  transform-origin: top;
+  transition: transform 400ms ease-in-out;
+}
+nav ul {
+  padding: 0;
+  margin: 0;
+  list-style: none; 
+}
+nav li {
+  margin-bottom: 1em;
+  margin-left: 1em;
+  
+}
+nav ul li ul {
+ display:none ;
+}
+nav ul li:hover ul{
+    display:block ;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 150ms ease-in-out;
+}
+nav a:hover {
+  color: #000;
+}
+.nav-toggle:checked ~ nav {
+  transform: scale(1, 1);
+}
+.nav-toggle:checked ~ nav a {
+  opacity: 1;
+  transition: opacity 250ms ease-in-out 250ms;
+}
+
+@media screen and (min-width: 800px) {
+  .nav-toggle-label {
+    display: none;
+  }
+  header {
+    display: grid;
+    grid-template-columns: 1fr auto minmax(600px, 3fr) 1fr;
+  }
+  .logo {
+    grid-column: 2 / 3;
+  }
+  nav {
+    all: unset;
+    grid-column: 3 / 4;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  nav ul {
+    display: flex;;
+  }
+  nav li {
+    margin-left: 3em;
+    margin-bottom: 0;
+  }
+  nav a {
+    opacity: 1;
+    position: relative;
+  }
+  nav a::before {
+    content: '';
+    display: block;
+    height: 5px;
+    background: black;
+    position: absolute;
+    top: -.75em;
+    left: 0;
+    right: 0;
+    transform: scale(0, 1);
+    transition: transform 250ms ease-in-out;
+  }
+  nav a:hover::before {
+    transform: scale(1, 1);
+  }
+}
+
+</style>
