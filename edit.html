@@ -1,0 +1,681 @@
+
+
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+        <title>photo effict</title>
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/2.1.19/css/materialdesignicons.css" media="all" rel="stylesheet" type="text/css" />
+
+    </head>
+
+    <body>
+
+        <div id="app" class="black">
+
+            <div id="wrapper">
+
+                <canvas id="cvs"></canvas>
+
+            </div>
+
+            <div id="overlay">
+
+                <div id="lsb" class="sidebar thick left">
+
+                    <span class="mdi mdi-close mdi-24px btn" style="float: right" onclick="toggle('lsb')"></span>
+
+                    <ul id="filter-list">
+
+                       <li>
+
+                           <img onclick="applyFilter('none')" src="https://i.pinimg.com/736x/e4/24/38/e424385345991b209169ea7b2c62a524--prostate-cancer-dog-cancer.jpg" />
+
+                       </li>
+
+                       <li>
+
+                           <img onclick="applyFilter('blur', '5px')" class="blur" src="https://i.pinimg.com/736x/e4/24/38/e424385345991b209169ea7b2c62a524--prostate-cancer-dog-cancer.jpg" />
+
+                       </li>
+
+                       <li>
+
+                           <img onclick="applyFilter('grayscale')" class="grayscale" src="https://i.pinimg.com/736x/e4/24/38/e424385345991b209169ea7b2c62a524--prostate-cancer-dog-cancer.jpg" />
+
+                       </li>
+
+                       <li>
+
+                           <img onclick="applyFilter('hue-rotate', '45deg')" class="hue-rotate-45" src="https://i.pinimg.com/736x/e4/24/38/e424385345991b209169ea7b2c62a524--prostate-cancer-dog-cancer.jpg" />
+
+                       </li>
+
+                       <li>
+
+                           <img onclick="applyFilter('hue-rotate', '135deg')" class="hue-rotate-135" src="https://i.pinimg.com/736x/e4/24/38/e424385345991b209169ea7b2c62a524--prostate-cancer-dog-cancer.jpg" />
+
+                       </li>
+
+                       <li>
+
+                           <img onclick="applyFilter('hue-rotate', '270deg')" class="hue-rotate-270" src="https://i.pinimg.com/736x/e4/24/38/e424385345991b209169ea7b2c62a524--prostate-cancer-dog-cancer.jpg" />
+
+                       </li>
+
+                       <li>
+
+                           <img onclick="applyFilter('invert', 1)" class="invert" src="https://i.pinimg.com/736x/e4/24/38/e424385345991b209169ea7b2c62a524--prostate-cancer-dog-cancer.jpg" />
+
+                       </li>
+
+                       <li>
+
+                           <img onclick="applyFilter('saturate', 10)" class="saturate" src="https://i.pinimg.com/736x/e4/24/38/e424385345991b209169ea7b2c62a524--prostate-cancer-dog-cancer.jpg" />
+
+                       </li>
+
+                       <li>
+
+                           <img onclick="applyFilter('sepia')" class="sepia" src="https://i.pinimg.com/736x/e4/24/38/e424385345991b209169ea7b2c62a524--prostate-cancer-dog-cancer.jpg" />
+
+                       </li>
+
+                    </ul>
+
+                </div>
+
+                <div id="rsb" class="sidebar right">
+
+                    <span class="mdi mdi-close mdi-24px btn" onclick="toggle('rsb')"></span>
+
+                </div>
+
+                <table id="menu">
+
+                    <tbody>
+
+                        <tr>
+
+                            <td>
+
+                                <span class="mdi mdi-tune mdi-24px btn" onclick="toggle('lsb')"></span>
+
+                            </td>
+
+                            <td>
+
+                                <span class="mdi mdi-camera mdi-24px btn" onclick="shoot()"></span>
+
+                            </td>
+
+                            <td>
+
+                                <span class="mdi mdi-image-multiple mdi-24px btn" onclick="toggle('rsb')"></span>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </body>
+
+</html>
+
+<script>
+
+    var video,cvs,ctx,filter,f = false;
+
+function getVideo()
+
+{
+
+    try
+
+    {
+
+        navigator.getUserMedia(
+
+            { video: true },
+
+            function( stream )
+
+            {
+
+                video.src = window.URL.createObjectURL( stream );
+
+                video.play();
+
+            },
+
+        
+
+            function( ex ) { console.log( "Oops. Something went wrong. Either your browser doesn't allow the access to the camera or doesn't find it" + ex ); }
+
+        );  
+
+    }
+
+    catch(ex)
+
+    {
+
+        console.log("Your browser doesn't support the userGetMedia method")
+
+    }
+
+}
+
+function streamOnCanvas()
+
+{
+
+    
+
+    width = video.videoWidth,
+
+    height = video.videoHeight;
+
+    
+
+    cvs.width = width;
+
+    cvs.height = height;
+
+    
+
+    ctx.filter = filter;
+
+        
+
+    ctx.drawImage(video, 0, 0, width, height);
+
+    
+
+    try
+
+    {
+
+        requestAnimationFrame(streamOnCanvas);
+
+    }
+
+    catch(ex)
+
+    {
+
+        if(!f)
+
+        {
+
+            setInterval(streamOnCanvas, 1000/60)
+
+            f = true;
+
+        }
+
+    }
+
+}
+
+function applyFilter(id, lvl)
+
+{
+
+    filter = id;
+
+    filter += lvl ? "(" + lvl + ")" : "()";
+
+}
+
+function shoot()
+
+{
+
+    var img = document.createElement("img");
+
+    var imgDataURL = cvs.toDataURL("image/png");
+
+        img.src = imgDataURL;
+
+        saveImage(img);
+
+}
+
+function saveImage(img)
+
+{
+
+    var sidebar = document.getElementById("rsb");
+
+    var wrp = document.createElement("div");
+
+    var ovly = document.createElement("div");
+
+    var dwnl = document.createElement("span");
+
+    var lnk = document.createElement("a");
+
+    
+
+    /* Structure:
+
+    * div.photo-wrp
+
+    *    img.photo
+
+    *    div.photo-overlay
+
+    *        a.mdi.mdi-arrow-collapse-down
+
+    */
+
+    
+
+    lnk.href = img.src;
+
+    lnk.download = img.src;
+
+    dwnl.classList.add("mdi", "mdi-arrow-collapse-down", "mdi-24px", "pos-fix", "btn");
+
+    wrp.classList.add("photo-wrp");
+
+    img.classList.add("photo");
+
+    ovly.classList.add("photo-overlay");
+
+        
+
+    lnk.appendChild(dwnl);
+
+    ovly.appendChild(lnk)
+
+    wrp.appendChild(img);
+
+    wrp.appendChild(ovly);
+
+    sidebar.appendChild(wrp);
+
+}
+
+function toggle(id)
+
+{
+
+     var bar = document.getElementById(id);
+
+     bar.classList.toggle( id + "-open" );
+
+}
+
+onload = function()
+
+{
+
+    video = document.createElement("video");
+
+    cvs = document.getElementById("cvs");
+
+    ctx = cvs.getContext("2d");
+
+    filter = "none";
+
+    
+
+    getVideo();
+
+    streamOnCanvas();
+
+}
+
+    
+
+</script>
+
+<style>
+
+    
+
+        body, .black {
+
+    margin: 0;
+
+    border: 0;
+
+    padding: 0;
+
+    color: #EAEAEA;
+
+}
+
+
+
+.black { background: black; }
+
+.btn { cursor: pointer; }
+
+
+
+canvas, #overlay {
+
+    width: 100%;
+
+    width: 100vw;
+
+    height: 100%;
+
+    height: 100vh;
+
+}
+
+
+
+#wrapper {
+
+    position: absolute;
+
+}
+
+
+
+#menu {
+
+    width: 100%;
+
+    width: 100vw;
+
+    padding: 5% 0 5% 0;
+
+    padding: 5vh 0 5vh 0;
+
+    
+
+    position: fixed;
+
+    margin-bottom: 0;
+
+    bottom: 0%;
+
+    
+
+    text-align: center;
+
+}
+
+
+
+.sidebar {
+
+    transition: all 0.3s;
+
+    background: rgba(0, 0, 0, 0.3);
+
+    position: fixed;
+
+    max-width: 30%;
+
+    max-width: 30vw;
+
+    width: 30%;
+
+    width: 30vw;
+
+    height: 100%;
+
+    height: 100vh;
+
+    overflow-x: hidden;
+
+    overflow-y: visible;
+
+    z-index: 2;
+
+}
+
+
+
+.thick {
+
+    width: 15%;
+
+    width: 15vw;
+
+}
+
+
+
+.right {
+
+    right: -30%;
+
+    right: -30vw;
+
+}
+
+
+
+.rsb-open {
+
+    right: 0;
+
+}
+
+
+
+.left {
+
+    left: -30%;
+
+    left: -30vw;
+
+}
+
+
+
+.lsb-open {
+
+    left: 0;
+
+}
+
+
+
+.photo {
+
+    position: relative;
+
+    width: 100%;
+
+}
+
+
+
+.photo-wrp {
+
+    position: relative;
+
+    width: 80%;
+
+    margin: 10%;
+
+    margin-bottom: 0;
+
+}
+
+
+
+.photo-overlay {
+
+    transition: opacity 0.3s;
+
+    background: black;
+
+    position: absolute;
+
+    margin-top: -75%;
+
+    width: 100%;
+
+    height: 100%;
+
+    opacity: 0;
+
+    z-index: 3;
+
+    text-align: center;
+
+}
+
+
+
+.photo-overlay:hover {
+
+    opacity: 0.3;
+
+}
+
+
+
+.photo-wrp:nth-child(2) {
+
+    margin-top: 0;
+
+}
+
+
+
+.pos-fix {
+
+    position: relative;
+
+    top: 40%;
+
+}
+
+
+
+a, a:hover, a:active, a:visited {
+
+    color: #EAEAEA;
+
+}
+
+
+
+#filter-list, #filter-list li {
+
+    list-style: none;
+
+    margin: 0;
+
+    padding: 0;
+
+}
+
+
+
+#filter-list {
+
+    padding: 15%;
+
+}
+
+
+
+#filter-list li {
+
+    margin-bottom: 10%;
+
+}
+
+
+
+#filter-list img {
+
+    width: 100%;
+
+    cursor: pointer;
+
+    border-radius: 5px;
+
+}
+
+
+
+/* Filter list */
+
+
+
+.blur {
+
+    filter: blur(1px);
+
+}
+
+
+
+.grayscale {
+
+    filter: grayscale(1);
+
+}
+
+
+
+.hue-rotate-45 {
+
+    filter: hue-rotate(45deg);
+
+}
+
+
+
+.hue-rotate-135 {
+
+    filter: hue-rotate(135deg);
+
+}
+
+
+
+.hue-rotate-270 {
+
+    filter: hue-rotate(270deg);
+
+}
+
+
+
+.invert {
+
+    filter: invert(1);
+
+}
+
+
+
+.saturate {
+
+    filter: saturate(25);
+
+}
+
+
+
+.sepia {
+
+    filter: sepia(25);
+
+}
+
+</style>
