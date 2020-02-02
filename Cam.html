@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+            <title>Web Camera</title>
+
+            
+
+    </head>
+
+    <body>
+
+            <video id="camera" width="450" height="300" autoplay></video>
+
+            <button id="capture">Capture</button>
+
+            <canvas id="canvas" width="450" height="300"></canvas>
+
+            
+
+    </body>
+
+</html>
+
+<script>
+
+    alert("This might not work through this app. Try this on real web browsers");
+
+window.onload = ()=>{
+
+    
+
+        
+
+    let camera = document.getElementById('camera'),
+
+        canvas = document.getElementById('canvas'),
+
+        context = canvas.getContext('2d');
+
+    // access camera
+
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+
+       //check video only **promise
+
+        navigator.mediaDevices.getUserMedia({ video: true }).then(function(capture) {
+
+            camera.src = window.URL.createObjectURL(capture);
+
+            camera.play();
+
+        });
+
+    }
+
+     //try getUserMedia 
+
+    else if(navigator.getUserMedia){
+
+        navigator.getUserMedia({ video: true }, function(capture) {
+
+            camera.src = capture;
+
+            camera.play();
+
+        }, err);
+
+       //webkit if avail
+
+    } else if(navigator.webkitGetUserMedia) {
+
+        navigator.webkitGetUserMedia({ video: true }, function(capture){
+
+            camera.src = window.webkitURL.createObjectURL(capture);
+
+            camera.play();
+
+        }, err);
+
+        //moz
+
+    } else if(navigator.mozGetUserMedia) {
+
+        navigator.mozGetUserMedia({ video: true }, function(capture){
+
+            camera.src = window.URL.createObjectURL(capture);
+
+            camera.play();
+
+        }, err);
+
+    }
+
+    //taking the shot
+
+    document.getElementById("capture").addEventListener("click", function() {
+
+        context.drawImage(camera, 0, 0, 450, 300);
+
+    });
+
+}
+
+</script>
+
+<style>
+
+    
+
+    body{
+
+    width: 100%;
+
+}
+
+#camera, #canvas{
+
+    display: block;
+
+    margin: auto;
+
+}
+
+#camera{
+
+    margin-bottom: 10px; 
+
+}
+
+</style>
