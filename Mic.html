@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--RUN IN THE BROWSER from  sololearn.com!!!!! 
+    https://code.sololearn.com/W2wmaka24jkx/#js
+    the SoloLearn mobile app has some issues
+        TESTED ON FIREFOX Desktop and Mobile
+        
+        Share your device microphone - Clap your hands or make some noise to switch on and off the light -->
+    
+    <meta charset="UTF-8">
+    <title>Audio input demo</title>
+    <!--imported p5js libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.7/p5.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.7/addons/p5.dom.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.7/addons/p5.sound.min.js" type="text/javascript"></script>
+    
+  </head>
+  <body>
+  </body>
+</html>
+
+<script>
+    alert("Run in the browser. It does not work within the android app.");//RUN IN THE BROWSER from sololearn.com!!!! the SoloLearn mobile app has some issues
+//here is a link: https://code.sololearn.com/W2wmaka24jkx/#js
+//Tested on firefox desktop and mobile
+/*based on p5.js live input demo of the p5sound library
+edited with an Audio debouncing Light switch 
+I'm a big Processing IDE fan because i 
+learned programming with it: I find it a simple
+environmet that lets anyone get things done quickly.
+And interactive feedback is always more satisfying than
+a console (even though the console looks kool!) and 
+I think that this is the reason why it kept me doing 
+and learning.
+Look at how simple the code below is!!
+If you like this sketch head over to processing.org
+for beginners friendly tutorials and additional info.
+
+Now run the code and enjoy light switching, clapping your hands!!!!
+verbose code to be easily understandable for 
+beginners like me.
+*/
+
+var mic; //declare microphone object
+var stat = false; //current volume level
+var prevStat = false; //previous volume level
+var fiatLux = false; //light status
+
+function setup() { //runs once at launching
+  createCanvas(windowWidth, windowHeight);
+
+  // Create an Audio input
+  mic = new p5.AudioIn();
+
+  // start the Audio Input.
+  // By default, it does not .connect() (to the computer speakers)
+  mic.start();
+}
+
+function draw() { //runs continously
+  if (fiatLux){ //evaluate light ON/OFF
+    background(220,220,0);
+  }else{
+    background(0);
+  }
+  textAlign(CENTER);
+  textSize(40);
+  fill(220,220,0);
+  text("Make some noise !", 10, 10,windowWidth-10, 50);
+  fill(0);
+  textSize(40);
+  text("Made with p5.js", 10, 60,windowWidth-10, 50);
+  textSize(40);
+  text("p5js.org", 10, windowHeight/2-50,windowWidth-10, 50);
+  textSize(40);
+  text("processing.org", 10, windowHeight/2,windowWidth-10, 50);
+  textAlign(LEFT);
+  textSize(12);
+  text("seamiki 27 Jan 2017", 10, windowHeight-30,windowWidth-10, 30);
+  
+  
+  // Get the overall volume (between 0 and 1.0)
+  var vol = mic.getLevel();
+  
+  //change the current status when volume reaches 6/10
+  if (vol > 0.2){
+    stat = true;
+  }else{
+    stat = false;
+  }
+  
+  //evaluate the status change (DEBOUNCING AUDIO INPUT :) )
+  //to switch the light
+  if ((stat === true) && (prevStat === false)){
+    fiatLux = !fiatLux;
+  }
+  
+  //visual feedback of audio status
+  fill(255,0,0);
+  stroke(0);
+
+  // Draw an ellipse with height based on volume
+  var h = map(vol, 0, 1, windowHeight, 0); 
+  ellipse(windowWidth/2, h - 25, 50, 50);
+  
+  //update previuos status with current one
+  prevStat = stat;
+}
+
+function mousePressed() {
+  if(fiatLux){
+    window.location.href = "https://processing.org";
+  }
+  // prevent default
+  return false;
+}
+</script>
+
+<style>
+    
+    body {
+    padding: 0; margin: 0;
+} 
+canvas {
+    vertical-align: top;
+}
+</style>
