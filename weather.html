@@ -1,0 +1,252 @@
+ 
+ <head>
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+     <style>
+
+     </style>
+ </head>
+ 
+
+<span id="txt">أكتب أسم المدينة</span>
+<br />
+ <div class="input-group mb-3">
+  <div class="input-group-prepend">
+    
+  </div>
+  <input type="text" class="form-control" id="selectCity" value="delhi" aria-describedby="basic-addon3">
+  <span class="input-group-text" id="click" onClick="t()">بحث</span>
+  
+</div>
+
+
+
+
+<div class="container">
+    <div class="weather">
+    <p id="countryName"></p>
+        <br>
+    <span id="today"></span><span id="time"></span><span id="weatherMessage"></span>
+    <br>
+    <br>
+    <span id="humidity"></span><br>
+     <span id="wind"></span>
+         <img id="wicon" src="https://3.bp.blogspot.com/-5cwwlLQu8bo/XECMHgIVzCI/AAAAAAAAJt8/ClauVHrwuoY57oxVizxGHNHpVv0xunkSwCLcBGAs/s1600/lg.liquid-fill-preloader.gif" width="40px" alt="Weather icon"><span id="currentWeather"></span>
+    </div>
+</div>
+<br>
+<br>
+ 
+<br />
+<iframe width="100%" height="500" id="gmap" src="" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
+
+
+
+</html>
+
+<style>
+     
+@import url('https://fonts.googleapis.com/css?family=PT+Mono');
+
+
+*{
+font-family: 'PT Mono', monospace;
+}
+
+body{padding: 5px;}
+
+
+.container{
+
+
+}
+
+
+.weather{
+margin:0 auto;
+padding:10px;
+width:90%;
+border:2px solid #2196F3;
+border-radius:5px;
+background-color:#2196F3;
+color:#fff;
+box-shadow:2px 2px 15px 1px #03A9F4;
+}
+
+
+.input-group-text{
+position:relative ;
+background-color: #4caf50;
+color: #fff;
+cursor: pointer;
+}
+
+
+
+#countryName{
+font-weight:bold;
+display:inline-block ;
+line-height:5px;
+}
+
+
+span
+{
+line-height:5px;
+}
+
+
+
+#currentWeather{
+font-weight:bold;
+font-size:1.6em;
+}
+
+
+
+#humidity{
+float: right;
+
+}
+
+
+#wind{
+float: right;
+
+}
+
+
+
+.btn-info{
+width:100px;
+}
+
+
+@media only screen and (min-width: 600px){
+.weather{
+width: 70%;
+}
+
+
+}
+
+
+
+#txt{
+font-weight:lighter;
+color:#aaa;
+
+line-height:0.9;
+font-size:15px;
+
+}
+
+
+.weather{
+margin:0 auto;
+padding:10px;
+width:100%;
+border:2px solid #2196F3;
+border-radius:5px;
+background-color:#2196F3;
+color:#fff;
+box-shadow:2px 2px 15px 1px #03A9F4;
+}
+
+.input-group-text{
+position:relative ;
+background-color: #4caf50;
+color: #fff;
+cursor: pointer;
+}
+
+
+#countryName{
+font-weight:bold;
+display:inline-block ;
+line-height:5px;
+}
+
+
+span{
+line-height:5px;
+}
+
+
+
+#currentWeather{
+font-weight:bold;
+font-size:1.6em;
+}
+
+</style>
+
+<script>
+     
+window.onload=function(){
+
+     document.getElementById("selectCity").value =  country_name[Math.floor(Math.random()*country_name.length)];;
+}
+var date=new Date();
+  
+   var days = [
+   "الأحد",
+    "الأثنين",
+     "الثلاثاء",
+      "الأربعاء",
+       "الخميس",
+        "الحجمعة",
+         "السبت"
+         ];
+
+var country_name = [
+ 
+  "فرنسا",
+   "الولايات المتحدة",
+    "الهند",
+     "الصين",
+      "مدريد",
+       "ايطاليا",
+        "تركيا",
+         "لندن",
+          "المانيا",
+           "العراق",
+             "روسيا",
+              "ماليزيا"
+];
+
+    function t(){
+     
+      var city=$("#selectCity").val();
+       var cTemp ;
+
+var apicall="https://api.openweathermap.org/data/2.5/weather?q="+city+"&units=metric&appid=af50bbd7309f973b6a2318253e78ad20";
+ $.getJSON(apicall,weatherCallback);
+
+    function weatherCallback(weatherData) {
+     var icn= weatherData.weather[0].icon;
+      var  temp=weatherData.main.temp;
+       var country=weatherData.name;
+        var des=weatherData.weather[0].description;
+         var humidity=weatherData.main.humidity;
+          var wind=weatherData.wind.speed;
+           var iconurl = "https://openweathermap.org/img/w/" + icn + ".png";
+  
+      $('#wicon').attr('src', iconurl);
+       $("#countryName").html(country)
+        $("#weatherMessage").html(des)
+         $("#currentWeather").html(temp+"°C")
+          $("#humidity").html("الرطوبة: %"+humidity)
+           $("#wind").html(wind+" km/h"+" : سرعة الرياح") 
+            $("#today").html(days[date.getDay()]+"-");
+             $("#time").html(date.getHours()+":"+date.getMinutes()+"-")
+     
+     
+      $("#gmap").attr('src',"https://maps.google.com/maps?q="+city+"&t=&z=13&ie=UTF8&iwloc=&output=embed")
+        }
+
+ }
+
+
+
+</script>
