@@ -1,0 +1,381 @@
+ 
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ابحث عن الأرقام</title>
+        <link href="https://fonts.googleapis.com/css?family=Nova Round|Almendra SC|Aldrich" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </head>
+    <body>
+ 
+        <div id="room">
+            <div id="light">
+                <p id="info">مساعدة</p>
+                <p id="NumOfLevel">المستوى: 1</p>
+            </div>
+            <p id="l1" class="l"></p>
+            <p id="l2" class="l"></p>
+            <p id="l3" class="l"></p>
+            
+            <p id="failed"></p>
+            <p id="load">جاري التحميل</p>
+        </div>
+        
+        <div id="pass">
+            <p id = "lightTimer"><i class="material-icons">الضوء</i><span id = lightsource>100%</span></p>
+            <input type="number" placeholder="الرقم السري" id="password">
+            <button id="save">متابعة</button>
+            
+            <div class="dot" id="dot1"></div>
+            <div class="dot" id="dot2"></div>
+            <div class="dot" id="dot3"></div>
+            <div class="dot" id="dot4"></div>
+            <div class="dot" id="dot5"></div>
+            <div class="dot" id="dot6"></div>
+            
+            <button id="replayButton" onclick="replay()"></button>
+            <div id="closed"></div>
+        </div>
+    </body>
+</html>
+
+
+
+<script>
+     
+
+function $(x){
+    switch (x[0]){
+        case "#":
+            var k=x.substr(1);
+            return document.getElementById(k);
+        case ".":
+            var k=x.substr(1);
+            return document.getElementsByClassName(k);
+        default:
+           return document.getElementsByTagName(x);
+    }
+}
+
+
+
+function randNum(){
+    return Math.floor(Math.random()*10);
+}
+
+//light for phone
+function go(event){
+    var posX=event.touches[0].clientX;
+    var posY=event.touches[0].clientY;
+    if(timer > 0){
+        $("#light").style.background=`radial-gradient(circle at ${posX}px ${posY}px ,rgba(255, 255, 140, 0.25) , transparent 7%,  transparent 15% , rgba(0 , 0 , 0 , 0.96) 24%)`;
+    }
+}
+
+//Light for pc
+function goPC(event){
+    var posX=event.clientX;
+    var posY=event.clientY;
+    if(timer > 0){
+        $("#light").style.background=`radial-gradient(circle at ${posX}px ${posY}px , rgba(255, 255, 140, 0.25) , transparent 7%,  transparent 15% ,  rgba(0 , 0 , 0 , 0.96) 24%)`;
+    }
+}
+
+//Random numbers
+var p1=randNum();
+var p2=randNum();
+var p3=randNum();
+
+//Position of random numbers
+function position(x,y){
+    $(x).innerText=y;
+    $(x).style.left=`calc(${Math.ceil(Math.random()*100)}% - 8px)`;
+    $(x).style.top=`calc(${Math.ceil(Math.random()*90)}% - 8px)`;
+}
+
+//Random position for random numbers.
+function begin(){
+    position("#l1",p1);
+    position("#l2",p2);
+    position("#l3",p3);
+    //position("l4",p4);
+}
+
+var inter; //Timer
+window.onload=function(){
+    $("#info").addEventListener("click",rules);
+    
+    $("#load").style.opacity="0";
+    $("#load").style.transform="translate(-50% , -50%) rotate(-7deg) scale(0)";
+    $("#closed").style.left="-100%";
+    begin();
+    $("#save").addEventListener("click",enterPassword);
+    $("#room").addEventListener("dblclick",hiddenClue);
+    //Events for light
+    $("#light").addEventListener("mousemove",function(){
+        goPC(event);
+    });
+    $("#light").addEventListener("touchmove",function(){
+        go(event);
+    });
+    inter  = setInterval(lightTimer, 1500);
+};
+
+//dblclick to access this.
+function hiddenClue(){
+    timer-=5;
+    for(k=0; k< $(".l").length; k++){
+        $(".l")[k].style.textShadow="0 0 1px red";
+        setTimeout(function(){
+            for(k=0; k< $(".l").length; k++){
+                $(".l")[k].style.textShadow="none";
+                $("#room").removeEventListener("dblclick",hiddenClue);
+            }//end of second for.
+        },450);//end of timer.
+    }//end of first for
+}//end of function
+
+
+//3! possible passwords.
+var level = 1;
+var life=5;
+function enterPassword(){
+    //Correct answer
+    if ($("#password").value==`${p1}${p2}${p3}` || $("#password").value==`${p1}${p3}${p2}` || $("#password").value==`${p2}${p1}${p3}`){
+        $("#failed").style.transform="translate(-50% , -50%) rotate(-7deg) scale(1)";
+        $("#failed").style.opacity="1";
+        $("#failed").style.color="green";
+        $("#failed").innerText="لقد ربحت!";
+        $("#save").removeEventListener("click",enterPassword);
+        $("#replayButton").style.top="10%";
+        $("#replayButton").innerText="الستوى التالي";
+        clearInterval(inter);
+        level++;
+        $("#NumOfLevel").innerText="المستوى: " + level;
+    }
+    //Wrong answer
+    else{
+        $(".dot")[life].style.backgroundColor="red";
+        life--;
+    }
+    //End game
+    if (life < 0){
+        $("#failed").style.color="red";
+        $("#failed").innerText="انتهت اللعبة";
+        $("#failed").style.transform="translate(-50% , -50%) rotate(-7deg) scale(1)";
+        $("#failed").style.opacity="1";
+        $("#save").removeEventListener("click",enterPassword);
+        $("#replayButton").style.top="10%";
+        $("#replayButton").innerText="Replay";
+        clearInterval(inter);
+        timer = 100;
+        level = 1;
+    }
+    $("#password").value="";
+}
+
+
+function replay(){
+    life=5;
+    for(k=0; k<$(".dot").length; k++){
+        $(".dot")[k].style.backgroundColor="green";
+        $("#failed").style.opacity="0";
+        $("#failed").style.transform="translate(-50% , -50%) rotate(-7deg) scale(0)";
+    }
+    p1=randNum();
+    p2=randNum();
+    p3=randNum();
+    begin();
+    $("#room").addEventListener("dblclick",hiddenClue);
+    $("#save").addEventListener("click",enterPassword);
+    $("#replayButton").style.top="180%";
+    inter = setInterval(lightTimer, 1500);
+    if(timer === 0) {timer = 100;}
+    $("#NumOfLevel").innerText="Lvl: " + level;
+}
+
+function rules(){
+    alert("القوانين:\n\n * هناك ثلاث ارقام مخفية اضغط على الشاشه لاشعال الضوء وأبدأ بالبحث عنها واكتبها بالتسلسل حين تجدها");
+}
+
+//Flashlight battery timer.
+var timer = 100;
+function lightTimer(){
+    if(timer > 0){
+        timer--;
+        $("#lightsource").innerText = timer + "%";
+    }
+    else{
+        $("#failed").style.color="red";
+        $("#failed").innerText="Game Over";
+        $("#failed").style.transform="translate(-50% , -50%) rotate(-7deg) scale(1)";
+        $("#failed").style.opacity="1";
+        $("#save").removeEventListener("click",enterPassword);
+        $("#replayButton").style.top="10%";
+        $("#replayButton").innerText="Replay";
+        $("#light").style.background = "black";
+    }
+}
+
+</script>
+
+
+<style>
+     
+#light{
+    position:absolute;
+    width:100%; height:100%;
+    left:0; top:0;
+    background-color:black;
+}
+
+#room{
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:90%;
+    background:url("https://imgur.com/GnCYq50.jpg");
+    background-size:cover;
+    background-position:center;
+    overflow:hidden;
+    cursor:crosshair;
+}
+
+#pass{
+    position:fixed;
+    bottom:0; left:0;
+    background-color:#151515;
+    width:100%; height:10%;
+    overflow:hidden;
+}
+
+#password{
+    position:absolute;
+    width:40%; height:80%;
+    bottom:0;
+    padding:0;
+    border:none;
+    outline:none;
+    top:10%; left:20%;
+    background-color:#333;
+    text-align:center;
+    color:#999;
+    letter-spacing:1px;
+    user-select:none;
+}
+
+#save{
+    position:absolute;
+    width:20%; height:80%;
+    top:10%; right:5%;
+    outline:none;
+    background-color:#333;
+    border:1vmin ridge #222;
+    transition:transform 0.1s;
+    color:#999;
+    user-select:none;
+}
+
+#save:active{
+    transform:scale(0.9);
+}
+
+.dot{
+    position:absolute;
+    width:0; height:0;
+    padding:1vmin;
+    background-color:green;
+    border-radius:50%;
+    left:64%;
+    border:1px solid black;
+}
+
+#dot1{top:11%;}
+#dot2{top:40%;}
+#dot3{top:69%;}
+#dot4{
+    top:11%;
+    left:69%;
+}
+#dot5{
+    top:40%;
+    left:69%;
+}
+#dot6{
+    top:69%;
+    left:69%;
+}
+
+#l1, #l2, #l3, #l4{
+    position:absolute;
+    font-weight:bold;
+    user-select:none;
+    cursor:default;
+}
+
+#failed, #load{
+    position:absolute;
+    color:red;
+    top:45%; left:50%;
+    transform:translate(-50% , -50%) rotate(-7deg) scale(0);
+    font-size:180%;
+    font-style:italic;
+    transition:opacity 1s, transform 0.55s;
+    opacity:0;
+    font-family:Almendra SC;
+    word-spacing:3px;
+    user-select:none;
+}
+
+#load{
+    color:white;
+    opacity:1;
+    transform:translate(-50% , -50%) rotate(-7deg) scale(1);
+}
+
+#replayButton{
+    width:40%; height:80%;
+    position:absolute;
+    left:20%; top:180%;
+    transition:all 1s;
+    background-color:#444;
+    color:#999;
+    outline:none;
+    letter-spacing:1px;
+    border:1vmin ridge #333;
+    user-select:none;
+}
+
+#closed{
+    position:absolute;
+    width:100%; height:100%;
+    background-color:black;
+    left:0; top:0;
+    transition:left 1s;
+}
+
+#info, #NumOfLevel{
+    color:white;
+    position:absolute;
+    right:5%; top:2%;
+    border:1px solid white;
+    border-radius:10vmin;
+    padding:2px;
+    font-size:90%;
+    user-select:none;
+}
+
+#NumOfLevel{
+    left:5%;
+    right:auto;
+}
+
+#lightTimer{
+    position:absolute;
+    line-height:5vh;
+    left:2.5%;
+    color:#999;
+    font-size:95%;
+    user-select:none;
+}
+
+</style>
