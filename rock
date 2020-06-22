@@ -1,0 +1,787 @@
+ 
+
+<!DOCTYPE html>
+<html>
+    <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">   
+   <script src="https://www.gstatic.com/firebasejs/5.9.2/firebase.js"></script> 
+    <title>حجر ورقة مقص</title>
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        <link href="https://fonts.googleapis.com/css?family=Baumans" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    </head>
+    <body>
+    <h5>أختر الحركة</h5>
+  <p id="result"></p>
+<div id="info"><span id="name1" class="atten">أنتظار...</span> <span id="vs">ضد</span> <span id="name2">أنتطار...</span></div>            
+    <div id="form">
+    <h3>حجر ورقة مقص</h3>
+    <form>
+        <div class="grou">      
+            <input type="tex" id="name" placeholder="Enter your name" autocomplete="off" required>
+           
+        </div>
+        <div class="grou">      
+            <input type="tex" id="room" placeholder="enter your room name" autocomplete ="off" required>
+            
+        </div>
+        <h6>الغرف المتاحة:</h6>
+        <ul id="alist">
+        </ul>
+        <div id="b">
+        <div id="cbtn" onclick="create()" style="background-color:#93b8d5;" class="waves-effect waves-light btn-large">إنشاء غرفة</div>
+        <div id="jbtn" onclick="join()" style="background-color:#93b8d5;" class="waves-effect waves-light btn-large">دخول غرفة</div>
+        </div>
+        </form>
+    </div>
+   <div id="moves">
+ <div onclick="rock()" id="rock" class="waves-effect waves-light btn-large">✊</div>      
+ <div onclick="paper()" id="paper" class="waves-effect waves-light btn-large">✋</div>
+ <div onclick="scissor()" id ="scissor" class="waves-effect waves-light btn-large">✂️</div>      
+   </div>
+<div id="moves1">
+ <div onclick="rock1()" id="rock" class="waves-effect waves-light btn-large">✊</div>      
+ <div onclick="paper1()" id="paper" class="waves-effect waves-light btn-large">✋</div>
+ <div onclick="scissor1()" id ="scissor" class="waves-effect waves-light btn-large">✂️</div>    
+   </div>
+</body>
+</html>
+
+<style>
+     
+body {
+    max-height: 100vh;
+    max-width: 100vw;
+    overflow: hidden;
+    margin: 0;
+    padding:0;
+    background-color: #537895; 
+    background:#effeff;    
+}
+a,#rock,#paper,#scissor{
+    margin-top: 20px; margin-bottom: 20px;
+    margin-left:30px;
+    transform: translateY(-80px);
+    font-family: Baumans;
+}
+p{
+    font-family: Baumans;
+    text-align:center;
+    padding-top:10%;
+    justify-item:center;
+    font-size:30px;
+    overflow-y:scroll;
+    color:tomato;
+}
+*{
+    margin: 0;
+    padding: 0;
+}
+h3{
+    font-family: Baumans;
+    font-weight: bold;
+    color: #000;
+    margin-left:30px;
+}
+#form {
+    height: 300px;
+    width: 300px;
+    margin: auto;
+    text-align: center;
+}
+
+#b {
+    text-align: center;
+    padding-top: 30px;
+}
+
+
+.slide {
+    animation: 1s slide forwards;
+}
+.slide2 {
+    animation: 1s slide2 forwards;
+}
+
+.grou{ 
+  position:relative; 
+  margin-bottom:45px; 
+  margin: 20px;
+  transform: translateY(-30px);
+  opacity: 0;
+}
+
+input{
+  font-size:18px;
+  padding:10px 10px 10px 5px;
+  width: 250px;
+  border:none;
+  color:#537895;
+  border-radius:5px;
+  text-align:center;
+  font-family: Baumans;
+  margin-left:20px;
+  box-shadow:0px 2px 2px rgba(0,0,0,0.2);
+  outline:none;
+}
+
+@keyframes slide {
+    from {
+        transform: translateX(-100vw);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+@keyframes slide2 {
+    from {
+        transform: translateX(0);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(100vw);
+        opacity: 1;
+        display: none;
+    }
+}
+
+.remove {
+    animation: 1s remove forwards;
+}
+@keyframes remove {
+    to { 
+        transform: translateY(30px);
+        opacity: 0;
+    }
+}
+.showem {
+    animation: 1s showem forwards;
+}
+
+@keyframes showem {
+    to {
+        transform: translateY(30px);
+        opacity: 1;
+    }
+}
+
+h6 {
+    font-size: 2rem;
+    color: #93b8d5;
+    font-family: Baumans;
+    font-weight: bold;
+    transform: translateY(-30px);
+    opacity: 0;
+    display: none;
+}
+#alist {
+    list-style: none;
+    transform: translateY(-30px);
+    opacity: 0;
+    display: none;
+    overflow-y:scroll;
+    height:200px;
+}
+#alist li {
+    font-size: 1.5rem;
+    color: white;
+    font-family: Baumans;
+    padding: 10px;
+    margin: 10px;
+    display: inline-block;
+    font-weight: bold;
+}
+#moves,#moves1{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    visibility:hidden;
+    display:flex;
+}
+
+@keyframes hide{
+    from{
+        opacity:1;
+    }
+    to{
+        opacity:0;
+        
+    }
+}
+#result{
+    width:100vw;
+    height:150px;    
+    background:#ececec;
+    box-shadow:0px 2px 2px rgba(0,0,0,0.2);
+    border-radius:5px;
+    position:absolute;
+    left:0px;
+    top:calc(80% - 150px);
+    visibility:hidden;
+}
+
+@keyframes pop{
+    0%{transform:scale(0.6);}
+    34%{transform:scale(1);}
+    66%{transform:scale(0.84);}
+    100%{transform:scale(1);}    
+}
+
+#info {
+    width: 100vw;
+    padding: 20px;
+    position: absolute;
+    color: white;
+    font-family: Baumans;
+    font-weight: bold;
+    text-align: center;
+    visibility:hidden;
+}
+#vs {
+    display: block;
+    font-size: 1rem;
+    padding: 10px;
+    color:#000;    
+}
+h5{
+    opacity:0;
+    text-align:center;
+    font-family: Baumans;
+    font-size:30px;    
+    position:absolute;
+    bottom:20%;left:0;right:0;
+    color:tomato;
+}
+#name2 ,#name1{
+    display: block;
+    font-size: 2rem;
+    padding: 10px;
+    background-color:lightgreen;
+    border-radius:5px;
+    animation:shake .7s infinite alternate;
+}
+@keyframes shown{    
+    to{opacity:1;}
+}
+@keyframes shake{    
+    to{transform:scale(0.7);}
+}
+
+#jbtn{
+    margin:20px 0px;
+}
+</style>
+
+<script>
+     
+var play;
+var list = [];
+var available = [];
+var ready = true;
+var ready2 = true;
+var database,ref;
+var player;
+var rname;
+var p1name;
+var winner="";
+var p2name;
+var mod = 0;
+var ai_moves, ply_moves;
+var over = false;
+var started = false;
+var ini = true;
+var moves="";
+var mov1, mov2;
+firebase_setup();
+function $(id){
+return document.getElementById(id);
+}
+function _(clas){
+return document.getElementsByClassName(clas);    
+}
+function tag(tagName){
+return document.getElementsByTagName(tagName)[0];
+}
+function create() {
+   let name =$("name").value.split("<").join("&lt;");
+   rname =$("room").value.split("<").join("&lt;");
+    if (ini) {
+        ini = false;
+        let m = _("grou");
+        m[0].classList.add("showem")
+        m[1].classList.add("showem")
+        $("cbtn").style.transform = "translateY(30px) scale(1.2)"
+        $("jbtn").classList.add("remove");       
+        return;
+    }
+    if(name.length > 10)name = name.substring(0,11)+"...";
+    
+    if (name === "" || rname === "") {
+        alert("معلومات غير كافية");
+        return;
+    }
+    //firebase_setup();
+    if (!list.includes(rname)) {
+        $("form").classList.add("slide2");
+     
+        setTimeout(() =>{ 
+        
+ $("form").style.visibility="hidden";
+ $("moves").style.visibility ="visible";
+ tag("h5").classList.add("showem");
+ }, 1000);
+       // fill1.innerHTML = name;
+  $("moves").style.opacity =1;      
+        started = true;
+        
+     
+      
+      
+    } else {
+        alert("تم استخدام الأسم يرجى اختيار اسم اخر");
+        return;
+    }
+    
+    
+}
+
+function join() {
+    if (ini) {
+        ini = false;
+        let m = _("grou");
+        m[0].classList.add("showem")
+        m[1].classList.add("showem")
+        m[1].style.display = "none";
+        tag("h6").classList.add("showem");
+        tag("h6").style.display = "block";
+        $("alist").style.display = "block"
+        $("alist").classList.add("showem");
+        $("jbtn").classList.add("remove")
+        $("cbtn").classList.add("remove");
+        
+        return;
+    }
+    let name = $("name").value.split("<").join("&lt;")
+    mov2 = moves;       
+    if (name === "" || rname === "") {
+        alert("Insufficient Information");
+        return
+    }
+    if (!list.includes(rname)) {
+        alert("لاتوجد غرفة بهذا الأسم.");
+        return;
+    } else {
+                $("form").classList.add("slide2");
+       
+        setTimeout(() => {
+ $("form").style.display="none";          
+ $("moves1").style.visibility ="visible";
+ tag("h5").classList.add("showem");        
+        }, 1000);
+       // fill2.innerHTML = name;
+    $("moves1").style.opacity =1;
+    }
+}
+var changed_move;
+
+function update(){
+
+
+   if(play.m1=="paper" &&
+play.m2=="rock"){
+    $("name1").innerHTML = play.p1;
+    $("name2").innerHTML = play.p2;
+    winner=play.p1+" فاز باللعبة";
+    setTimeout(()=>{
+     $("result").style.visibility = "visible";
+$("result").style.animation ="pop .7s linear"   
+},1000);
+   $("result").innerHTML=winner; 
+    let frezeRef = firebase.database().ref("/rooms/"+rname);
+      // console.log(rname);
+       frezeRef.off("value");
+       frezeRef.remove()
+   // player.splice(2)
+    
+}
+ else if(play.m1 =="rock" && play.m2 =="scissor"){
+ $("name1").innerHTML = play.p1;
+    $("name2").innerHTML = play.p2;
+    winner=play.p1+" فاز باللعبة";
+    setTimeout(()=>{
+     $("result").style.visibility = "visible";
+$("result").style.animation ="pop .7s linear"   
+},1000);
+  $("result").innerHTML=winner;  
+     let frezeRef = firebase.database().ref("/rooms/"+rname);
+     //  console.log(rname);
+       frezeRef.off("value");
+       frezeRef.remove()
+     
+ }
+ else if(play.m1 =="rock" && play.m2 =="paper"){
+     $("name1").innerHTML = play.p1;
+    $("name2").innerHTML = play.p2;
+     winner=play.p2+" فاز باللعبة";
+    setTimeout(()=>{
+     $("result").style.visibility = "visible";
+$("result").style.animation ="pop .7s linear"   
+},1000); 
+   $("result").innerHTML=winner;   
+     let frezeRef = firebase.database().ref("/rooms/"+rname);
+     //  console.log(rname);
+       frezeRef.off("value");
+       frezeRef.remove()
+ }
+ else if(play.m1 =="scissor" && play.m2 =="paper"){
+     $("name1").innerHTML = play.p1;
+    $("name2").innerHTML = play.p2;
+     winner =play.p1 +" فاز باللعبة";
+  setTimeout(()=>{
+     $("result").style.visibility = "visible";
+$("result").style.animation ="pop .7s linear"   
+},1000);    
+   $("result").innerHTML=winner;  
+      let frezeRef = firebase.database().ref("/rooms/"+rname);
+     //  console.log(rname);
+       frezeRef.off("value");
+       frezeRef.remove()
+ }
+ else if(play.m1 == "paper" && play.m2 =="scissor"){
+    $("name1").innerHTML = play.p1;
+    $("name2").innerHTML = play.p2;
+     winner = play.p2 +" فاز باللعبة";
+setTimeout(()=>{
+     $("result").style.visibility = "visible";
+$("result").style.animation ="pop .7s linear"   
+},1000);      
+  $("result").innerHTML=winner;   
+      let frezeRef = firebase.database().ref("/rooms/"+rname);
+      // console.log(rname);
+       frezeRef.off("value");
+       frezeRef.remove()
+ }
+ else if(play.m1 =="scissor" && play.m2 =="rock"){
+    $("name1").innerHTML = play.p1;
+    $("name2").innerHTML = play.p2;
+    winner =play.p2 +" فاز باللعبة" ;
+   setTimeout(()=>{
+     $("result").style.visibility = "visible";
+$("result").style.animation ="pop .7s linear"   
+},1000);  
+  $("result").innerHTML=winner;  
+    let frezeRef = firebase.database().ref("/rooms/"+rname);
+      // console.log(rname);
+       frezeRef.off("value");
+       frezeRef.remove()
+ }
+ else if((play.m1 =="paper" && play.m2 =="paper") ||(play.m1 =="rock" && play.m2 =="rock") ||(play.m1 =="scissor" && play.m2 =="scissor") ){
+ $("name1").innerHTML = play.p1;
+    $("name2").innerHTML = play.p2;
+    winner="Match Draw!!"
+    setTimeout(()=>{
+     $("result").style.visibility = "visible";
+$("result").style.animation ="pop .7s linear"   
+},1000);   
+    $("result").innerHTML=winner;
+     let frezeRef = firebase.database().ref("/rooms/"+rname);
+     //  console.log(rname);
+       frezeRef.off("value");
+       frezeRef.remove()
+ }
+   
+  
+}
+function firebase_setup(){   
+firebase.initializeApp({
+    databaseURL: "https://sololearn-project.firebaseio.com",
+});
+database = firebase.database();
+ref=database.ref("rooms/");
+ref.on("value", function(data){
+if(data.val() !== null && data.val() !== undefined) {
+ list = Object.keys(data.val());                    Object.keys(data.val()).forEach(function (key){
+let value = data.val();
+let p = value[key];
+if(p.p2 === "")available.push(key);
+ })
+  var alist = $("alist");
+  alist.innerHTML = "";
+ let roomNames = tag("h6");
+roomNames.innerHTML = available.length > 0 ? "الغرف المتاحة:" : "لاتوجد غرف متاحة";
+ available.forEach(function(roo){
+let curlist = document.createElement("li");
+  curlist.innerHTML = roo;
+  curlist.style.color="#000";
+  curlist.onclick = function () {
+    rname=roo;
+    join();    
+   };   
+alist.appendChild(curlist);
+});
+                }
+            }); 
+}
+function rock(){
+    $("moves").style.animation="hide 1s linear";
+   tag("h5").classList.add("remove");
+       $("info").style.opacity =0;
+    setTimeout(()=>{
+    tag("h5").style.visibility="hidden";
+   
+    $("moves").style.visibility="hidden";
+      $("moves").style.display = "none" ;
+     $("info").style.visibility ="visible"; 
+      $("info").style.animation ="shown 1s linear"
+      $("info").style.opacity =1;
+      
+    },1000)
+    if(ready){
+    ready = false;
+   moves = "rock";
+   let name = $("name").value.split("<").join("&lt;");
+   rname =$("room").value.split("<").join("&lt;");
+    if (name.length > 10)
+   name = name.substring(0,11) + "...";
+   mov1= "rock";
+   var add = database.ref("/rooms/" + rname);
+        let room = {
+         p1 : "",
+         p2 : "",
+         m1 : "",
+         m2 : "", 
+        }
+        room.p1 = name;
+        room.m1 = mov1;
+        $("name1").innerHTML = room.p1;
+        add.set(room);
+        add.on("value", data => {
+            play = data.val();
+            if (play.p2 !== "") {
+                p2name = play.p2;                
+            }
+            update();
+            
+        });   
+}
+}
+function paper(){
+    tag("h5").classList.add("remove");
+      $("moves").style.animation="hide 1s linear";
+     $("info").style.opacity =0;
+    setTimeout(()=>{
+    tag("h5").style.visibility="hidden";
+    $("moves").style.visibility="hidden";
+      $("moves").style.display = "none" ;
+      $("info").style.visibility ="visible"; 
+      $("info").style.animation ="shown 1s linear"
+      $("info").style.opacity =1;
+      
+    },1000)
+    if(ready){
+    ready = false;
+    moves = "paper";
+    //ready =true;
+     let name = $("name").value.split("<").join("&lt;");
+     if (name.length > 10)
+        name = name.substring(0,11) + "..."; 
+   rname =$("room").value.split("<").join("&lt;");
+   mov1= "paper";
+   var add = database.ref("/rooms/" + rname);
+        let room = {
+         p1 : "",
+         p2 : "",
+         m1 : "",
+         m2 : "", 
+        }
+        room.p1 = name;
+        room.m1 = mov1;
+     $("name1").innerHTML = room.p1;   
+        add.set(room);
+        add.on("value", data => {
+            play = data.val();
+            if (play.p2 !== "") {
+                p2name = play.p2;
+                
+            }
+            update();
+            
+        });
+   }
+}
+function scissor(){
+     $("moves").style.animation="hide 1s linear";
+    tag("h5").classList.add("remove");
+     $("info").style.opacity =0;
+    setTimeout(()=>{
+    tag("h5").style.visibility="hidden";
+   
+    $("moves").style.visibility="hidden";
+      $("moves").style.display = "none" ;
+      $("info").style.visibility ="visible"; 
+      $("info").style.animation ="shown 1s linear"
+      $("info").style.opacity =1;
+      
+  
+    },1000)
+    if(ready){
+    ready = false;
+    moves = "paper";
+    //ready =true;
+     let name = $("name").value.split("<").join("&lt;");
+      if (name.length > 10)
+        name = name.substring(0,11) + "...";
+   rname =$("room").value.split("<").join("&lt;");
+   mov1= "scissor";
+   var add = database.ref("/rooms/" + rname);
+        let room = {
+         p1 : "",
+         p2 : "",
+         m1 : "",
+         m2 : "", 
+        }
+        room.p1 = name;
+        room.m1 = mov1;
+        $("name1").innerHTML = room.p1;
+        add.set(room);
+        add.on("value", data => {
+            play = data.val();
+            if (play.p2 !== "") {
+                p2name = play.p2;
+                
+            }
+            update();
+            
+        });
+   }
+}
+function rock1(){
+    tag("h5").classList.add("remove");
+    $("moves1").style.animation="hide 1s linear";
+    $("info").style.opacity =0;
+    setTimeout(()=>{
+    tag("h5").style.visibility="hidden";
+   
+    $("moves").style.visibility="hidden";
+      $("moves1").style.display = "none" ;
+     $("info").style.visibility ="visible"; 
+      $("info").style.animation ="shown 1s linear"
+      $("info").style.opacity =1;
+    },1000)
+     if(ready2){
+    ready2 = false;
+      var join = database.ref("/rooms/" + rname);
+        join.on("value", data => {
+            play = data.val();
+            if (!started) {
+            if (play.p2 !== "") {
+                alert("Room Full!");
+                join.off("value");
+                return;
+            }
+            }             
+       let name =$("name").value.split("<").join("&lt;");
+      if (name.length > 10)
+        name = name.substring(0,11) + "...";  
+       mov2 ="rock";
+        p2name = name;
+        started = true;        
+            play.p2 = name;
+            play.m2 = mov2;
+     $("name2").innerHTML = play.p2;
+     $("name1").innerHTML = play.p1;          
+            join.set(play);
+            p1name = play.p1;
+       update(); 
+         
+        });
+}
+}
+function paper1(){
+    tag("h5").classList.add("remove");
+     $("moves1").style.animation="hide 1s linear";
+    $("info").style.opacity =0;
+    setTimeout(()=>{
+    tag("h5").style.visibility="hidden";       
+    $("moves1").style.visibility="hidden";
+      $("moves1").style.display = "none" ;
+      $("info").style.visibility ="visible"; 
+      $("info").style.animation ="shown 1s linear"
+      $("info").style.opacity =1;
+    },1000)
+     if(ready2){
+    ready2 = false;
+    var join = database.ref("/rooms/" + rname);
+        join.on("value", data => {
+            play = data.val();
+            if (!started) {
+            if (play.p2 !== "") {
+                alert("Room Full!");
+                joim.off("value");
+                return;
+            }
+            }             
+       let name =$("name").value.split("<").join("&lt;");
+      if (name.length > 10)
+        name = name.substring(0,11) + "...";  
+       mov2 ="paper";
+        p2name = name;
+        started = true;        
+            play.p2 = name;
+            play.m2 = mov2;
+         $("name2").innerHTML = play.p2;    
+          $("name1").innerHTML = play.p1;     
+            join.set(play);
+            p1name = play.p1;
+       update(); 
+         
+        });
+}
+}
+function scissor1(){
+    tag("h5").classList.add("remove");
+     $("moves1").style.animation="hide 1s linear";
+    $("info").style.opacity =0;
+    setTimeout(()=>{
+    tag("h5").style.visibility="hidden";
+   
+    $("moves1").style.visibility="hidden";
+      $("moves1").style.display = "none" ;
+     $("info").style.visibility ="visible"; 
+      $("info").style.animation ="shown 1s linear"
+      $("info").style.opacity =1;
+    },1000)
+    if(ready2){
+    ready2 = false;
+    var join = database.ref("/rooms/" + rname);
+        join.on("value", data => {
+            play = data.val();
+            if (!started) {
+            if (play.p2 !== "") {
+                alert("Room Full!");
+                join.off("value");
+                return;
+            }
+            }             
+       let name =$("name").value.split("<").join("&lt;");
+      if (name.length > 10)
+        name = name.substring(0,11) + "...";  
+       mov2 ="scissor";
+        p2name = name;
+        started = true;        
+            play.p2 = name;
+            play.m2 = mov2;
+     $("name2").innerHTML = play.p2;
+      $("name1").innerHTML = play.p1;             
+            join.set(play);
+            p1name = play.p1;
+       update(); 
+         
+        });
+}
+}
+
+</script>
